@@ -1,0 +1,21 @@
+name: McRPG
+version: '${project.version}'
+main: dirkyg.mcrpg.McRPG
+api-version: 1.20
+authors: [ DirkyG ]
+description: Plugin I made
+depend:
+  - ProtocolLib
+commands:
+  class:
+    description: Allows the user to pick a class to use
+  init:
+    description: Does stuff
+  genworld:
+    description: Makes world
+  tpworld:
+    description: Teleports a player to the world
+  listworlds:
+    description: List of worlds
+  loadworld:
+    description: Loads world
