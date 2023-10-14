@@ -1,7 +1,14 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.Common.createItem;
+import static dirkyg.mcrpg.Utilities.Common.getRandomNumber;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+import static dirkyg.mcrpg.Utilities.Visuals.sendActionBar;
+
+import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -12,9 +19,7 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
 
 
 public class FishingSkill extends Skill implements Listener {
@@ -33,25 +38,25 @@ public class FishingSkill extends Skill implements Listener {
 
     private HashMap<ItemStack, String> initializeItemsAndMsgs() {
         HashMap<ItemStack, String> items = new HashMap<>();
-        items.put(Utils.createItem(Material.GOLDEN_APPLE, "", 1, null, null), Utils.chat("&dYou found a golden apple from fishing!"));
-        items.put(Utils.createItem(Material.DIAMOND, "", 1, null, null), Utils.chat("&dYou found a diamond from fishing!"));
-        items.put(Utils.createItem(Material.EMERALD, "", 1, null, null), Utils.chat("&dYou found a diamond from fishing!"));
-        items.put(Utils.createItem(Material.IRON_INGOT, "", 1, null, null), Utils.chat("&dYou found a diamond from fishing!"));
-        items.put(Utils.createItem(Material.GOLD_INGOT, "", 1, null, null), Utils.chat("&dYou found a diamond from fishing!"));
-        items.put(Utils.createItem(Material.COPPER_INGOT, "", 1, null, null), Utils.chat("&dYou found a diamond from fishing!"));
-        items.put(Utils.createItem(Material.COAL, "", 1, null, null), Utils.chat("&dYou found a diamond from fishing!"));
-        items.put(Utils.createItem(Material.NAME_TAG, "", 1, null, null), Utils.chat("&dYou found a name tag from fishing!"));
-        items.put(Utils.createItem(Material.SALMON, "", 2, null, null), Utils.chat("&dYou got two salmon from one cast!"));
-        items.put(Utils.createItem(Material.COD, "", 2, null, null), Utils.chat("&dYou got two cod from one cast!"));
-        items.put(Utils.createItem(Material.PUFFERFISH, "", 2, null, null), Utils.chat("&dYou got two pufferfish from one cast!"));
+        items.put(createItem(Material.GOLDEN_APPLE, "", 1), "&dYou found a golden apple from fishing!");
+        items.put(createItem(Material.DIAMOND, "", 1), "&dYou found a diamond from fishing!");
+        items.put(createItem(Material.EMERALD, "", 1), "&dYou found a diamond from fishing!");
+        items.put(createItem(Material.IRON_INGOT, "", 1), "&dYou found a diamond from fishing!");
+        items.put(createItem(Material.GOLD_INGOT, "", 1), "&dYou found a diamond from fishing!");
+        items.put(createItem(Material.COPPER_INGOT, "", 1), "&dYou found a diamond from fishing!");
+        items.put(createItem(Material.COAL, "", 1), "&dYou found a diamond from fishing!");
+        items.put(createItem(Material.NAME_TAG, "", 1), "&dYou found a name tag from fishing!");
+        items.put(createItem(Material.SALMON, "", 2), "&dYou got two salmon from one cast!");
+        items.put(createItem(Material.COD, "", 2), "&dYou got two cod from one cast!");
+        items.put(createItem(Material.PUFFERFISH, "", 2), "&dYou got two pufferfish from one cast!");
         for (Material m : Material.values()) {
             if (m.toString().contains("MUSIC_DISC")) {
-                items.put(Utils.createItem(m, "", 1, null, null), Utils.chat("&dYou found a record!"));
+                items.put(createItem(m, "", 1), "&dYou found a record!");
             }
         }
-        items.put(Utils.createItem(Material.PANDA_SPAWN_EGG, "", 1, null, null), Utils.chat("&dYou found a panda spawn egg from fishing... Somehow..."));
-        items.put(Utils.createItem(Material.TURTLE_EGG, "", 1, null, null), Utils.chat("&dYou found a turtle egg from fishing... Somehow..."));
-        items.put(Utils.createItem(Material.PARROT_SPAWN_EGG, "", 1, null, null), Utils.chat("&dYou found a parrot spawn egg from fishing... Somehow..."));
+        items.put(createItem(Material.PANDA_SPAWN_EGG, "", 1), "&dYou found a panda spawn egg from fishing... Somehow...");
+        items.put(createItem(Material.TURTLE_EGG, "", 1), "&dYou found a turtle egg from fishing... Somehow...");
+        items.put(createItem(Material.PARROT_SPAWN_EGG, "", 1), "&dYou found a parrot spawn egg from fishing... Somehow...");
         return items;
     }
 
@@ -63,7 +68,7 @@ public class FishingSkill extends Skill implements Listener {
         }
         if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
             if (event.getCaught() instanceof Item) {
-                int randomNum = Utils.getRandomNumber(0, 100);
+                int randomNum = getRandomNumber(0, 100);
                 if (randomNum < percentChangeCustomDrop) {
                     HashMap<ItemStack, String> itemMsgs = initializeItemsAndMsgs();
                     Random rand = new Random();
@@ -74,7 +79,7 @@ public class FishingSkill extends Skill implements Listener {
                     event.getHook().getWorld().dropItem(event.getHook().getLocation(), item).setVelocity(direction);
                     event.getCaught().remove();
                     String msg = itemMsgs.get(item);
-                    Utils.sendActionBar(player, msg);
+                    sendActionBar(player, msg);
                 }
                 SkillManager.processSkillIncrement(player, this, 7);
             }
@@ -84,7 +89,7 @@ public class FishingSkill extends Skill implements Listener {
     private void upgradeFishingPercentage(Player player) {
         int fishingPercentageUpgrade = 2;
         percentChangeCustomDrop += fishingPercentageUpgrade;
-        player.sendMessage(Utils.chat("&6Ability Upgraded | Building Jump Boost | Percentage (" + (percentChangeCustomDrop - fishingPercentageUpgrade) + " -> " + percentChangeCustomDrop + ") %"));
+        player.sendMessage(colorText("&6Ability Upgraded | Building Jump Boost | Percentage (" + (percentChangeCustomDrop - fishingPercentageUpgrade) + " -> " + percentChangeCustomDrop + ") %"));
     }
 
     @Override

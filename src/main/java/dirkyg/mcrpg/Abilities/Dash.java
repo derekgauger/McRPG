@@ -1,8 +1,6 @@
 package dirkyg.mcrpg.Abilities;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Skills.Skill;
-import dirkyg.mcrpg.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.UUID;
+
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isSword;
 
 public class Dash extends Ability implements Listener {
 
@@ -38,7 +38,7 @@ public class Dash extends Ability implements Listener {
         if (player.getUniqueId() != playerUUID || !isHappening || item == null || player.isSneaking() || System.currentTimeMillis() < nextAvailableUsage) {
             return;
         }
-        if (event.getAction() == Action.RIGHT_CLICK_AIR && Utils.isSword(item.getType())) {
+        if (event.getAction() == Action.RIGHT_CLICK_AIR && isSword(item.getType())) {
             dashPlayer(player);
             nextAvailableUsage = System.currentTimeMillis() + dashCoolDown * 1000L;
         }

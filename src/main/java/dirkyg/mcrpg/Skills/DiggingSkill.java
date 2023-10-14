@@ -1,10 +1,11 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.Abilities.Ability;
-import dirkyg.mcrpg.Abilities.ExcavationRun;
-import dirkyg.mcrpg.Abilities.InstaBreak;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isDigMat;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isShovel;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +17,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Abilities.Ability;
+import dirkyg.mcrpg.Abilities.InstaBreak;
 
 public class DiggingSkill extends Skill implements Listener {
 
@@ -42,7 +45,7 @@ public class DiggingSkill extends Skill implements Listener {
         ItemStack usedItem = player.getInventory().getItemInMainHand();
         Material usedItemType = usedItem.getType();
         Block brokenBlock = event.getBlock();
-        if (Utils.isDigMat(brokenBlock.getType()) && Utils.isShovel(usedItemType)) {
+        if (isDigMat(brokenBlock.getType()) && isShovel(usedItemType)) {
             SkillManager.processSkillIncrement(player, this, 1);
         }
     }
@@ -52,7 +55,7 @@ public class DiggingSkill extends Skill implements Listener {
         Player player = event.getPlayer();
         ItemStack currentItem = player.getInventory().getItemInMainHand();
         Material currentItemType = currentItem.getType();
-        if (player.getUniqueId() != uuid || !player.isSneaking() || instaBreak.isHappening() || !Utils.isShovel(currentItemType)) {
+        if (player.getUniqueId() != uuid || !player.isSneaking() || instaBreak.isHappening() || !isShovel(currentItemType)) {
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -79,7 +82,7 @@ public class DiggingSkill extends Skill implements Listener {
                 if (player == null) {
                     return;
                 }
-                player.sendMessage(Utils.chat("&6Ability Upgraded | " + instaBreak + " | Duration (" + (instaBreak.duration - instaBreakTimeUpgrade) + " -> " + instaBreak.duration + ") seconds"));
+                player.sendMessage(colorText("&6Ability Upgraded | " + instaBreak + " | Duration (" + (instaBreak.duration - instaBreakTimeUpgrade) + " -> " + instaBreak.duration + ") seconds"));
         }
     }
 }

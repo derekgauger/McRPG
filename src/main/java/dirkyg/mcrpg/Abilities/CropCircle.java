@@ -1,8 +1,6 @@
 package dirkyg.mcrpg.Abilities;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Skills.Skill;
-import dirkyg.mcrpg.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,6 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.UUID;
+
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isCrop;
 
 public class CropCircle extends Ability implements Listener {
 
@@ -36,7 +36,7 @@ public class CropCircle extends Ability implements Listener {
             return;
         }
         Block block = event.getBlockPlaced();
-        if (Utils.isCrop(block.getType())) {
+        if (isCrop(block.getType())) {
             plantCropCircle(block, radius);
         }
     }

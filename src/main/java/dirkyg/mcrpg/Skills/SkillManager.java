@@ -1,8 +1,11 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.CustomAnimals.AnimalBeaconManager;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+import static dirkyg.mcrpg.Utilities.Visuals.launchLevelUpFirework;
+
+import java.util.HashMap;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,8 +15,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.HashMap;
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.CustomAnimals.AnimalBeaconManager;
 
 public class SkillManager implements Listener, CommandExecutor {
 
@@ -70,8 +73,8 @@ public class SkillManager implements Listener, CommandExecutor {
             skill.incrementLevel();
             skill.processAbilityUpgrade();
             System.out.println(skill.getLevel() + " | " + skill.getTotalXp());
-            player.sendMessage(Utils.chat("&dIncreased " + skill + " skill to level " + skill.getLevel() + "!"));
-            Utils.launchLevelUpFirework(player.getLocation());
+            player.sendMessage(colorText("&dIncreased " + skill + " skill to level " + skill.getLevel() + "!"));
+            launchLevelUpFirework(player.getLocation());
         }
     }
 

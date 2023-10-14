@@ -1,11 +1,6 @@
 package dirkyg.mcrpg.Abilities;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Skills.DiggingSkill;
-import dirkyg.mcrpg.Skills.LoggingSkill;
-import dirkyg.mcrpg.Skills.MiningSkill;
-import dirkyg.mcrpg.Skills.Skill;
-import dirkyg.mcrpg.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
@@ -17,6 +12,8 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
+
+import static dirkyg.mcrpg.Utilities.BooleanChecks.*;
 
 public class InstaBreak extends Ability implements Listener {
     public InstaBreak(UUID uuid, String classifier) {
@@ -36,11 +33,11 @@ public class InstaBreak extends Ability implements Listener {
         Block block = event.getBlock();
         boolean doBreak = false;
         if (classifier.equalsIgnoreCase("Mining")) {
-            doBreak = Utils.isMineMat(block.getType()) && Utils.isPickaxe(itemUsed.getType());
+            doBreak = isMineMat(block.getType()) && isPickaxe(itemUsed.getType());
         } else if (classifier.equalsIgnoreCase("Logging")) {
-            doBreak = Utils.isWood(block.getType()) && Utils.isAxe(itemUsed.getType());
+            doBreak = isWood(block.getType()) && isAxe(itemUsed.getType());
         } else if (classifier.equalsIgnoreCase("Digging")) {
-            doBreak = Utils.isDigMat(block.getType()) && Utils.isShovel(itemUsed.getType());
+            doBreak = isDigMat(block.getType()) && isShovel(itemUsed.getType());
         }
         if (doBreak && player.getGameMode() != GameMode.CREATIVE) {
             event.setCancelled(true);

@@ -1,14 +1,15 @@
 package dirkyg.mcrpg.Classes.WarriorClasses;
 
-import dirkyg.mcrpg.Abilities.Ability;
-import dirkyg.mcrpg.Abilities.Dash;
-import dirkyg.mcrpg.Classes.RPGClass;
-import dirkyg.mcrpg.Classes.WarriorClasses.Berserker;
-import dirkyg.mcrpg.Classes.WarriorClasses.Elemental;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isSword;
+
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
-import org.bukkit.entity.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -18,7 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Abilities.Ability;
+import dirkyg.mcrpg.Abilities.Dash;
+import dirkyg.mcrpg.Classes.RPGClass;
 
 public class Warrior extends RPGClass implements Listener {
 
@@ -55,7 +59,7 @@ public class Warrior extends RPGClass implements Listener {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             player.setWalkSpeed(baseSpeed);
-            player.setMaxHealth(32.0);
+            player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(32.0);
         }
         setCurrentlyActive(true);
     }
@@ -65,7 +69,7 @@ public class Warrior extends RPGClass implements Listener {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             player.setWalkSpeed(.2f);
-            player.setMaxHealth(20.0);
+            player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0);
         }
         setCurrentlyActive(false);
     }
@@ -92,7 +96,7 @@ public class Warrior extends RPGClass implements Listener {
         }
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        if (item == null || !Utils.isSword(item.getType()) || !player.isSneaking() || dash.isHappening()) {
+        if (item == null || !isSword(item.getType()) || !player.isSneaking() || dash.isHappening()) {
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_AIR) {

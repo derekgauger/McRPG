@@ -1,6 +1,28 @@
 package dirkyg.mcrpg.WorldGeneration;
 
 
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -12,29 +34,16 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
-import org.bukkit.*;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.generator.ChunkGenerator;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import dirkyg.mcrpg.McRPG;
 
 public class SchematicWorldGenerator implements CommandExecutor {
 
     private final WorldEditPlugin worldEdit;
-    McRPG plugin;
     private static final String createdWorldNamesFile = "created_world_names.ser";
     private static List<String> createdWorldNames = new ArrayList<>();
 
-    public SchematicWorldGenerator(McRPG plugin) {
-        this.plugin = plugin;
+    public SchematicWorldGenerator() {
         this.worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
         if (this.worldEdit == null) {
             throw new RuntimeException("WorldEdit not found!");
@@ -105,7 +114,7 @@ public class SchematicWorldGenerator implements CommandExecutor {
         }
         if (label.equalsIgnoreCase("listworlds")) {
             for (World world : Bukkit.getServer().getWorlds()) {
-                player.sendMessage(Utils.chat("&d" + world.getName()));
+                player.sendMessage(colorText("&d" + world.getName()));
             }
         }
         return false;
@@ -113,7 +122,7 @@ public class SchematicWorldGenerator implements CommandExecutor {
 
     public void createVoidWorldWithSchematic(String worldName, World.Environment environment, String schematicName) {
         World voidWorld = createWorld(worldName, environment);
-        File schematicFile = new File(plugin.getDataFolder(), schematicName);
+        File schematicFile = new File(McRPG.plugin.getDataFolder(), schematicName);
         pasteSchematicIntoWorld(schematicFile, voidWorld, new Location(voidWorld, 0, 100, 0));
     }
 

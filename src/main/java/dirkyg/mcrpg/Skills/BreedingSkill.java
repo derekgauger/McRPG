@@ -1,7 +1,12 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.Common.getRandomNumber;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -11,9 +16,7 @@ import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
 
 public class BreedingSkill extends Skill implements Listener {
 
@@ -44,7 +47,7 @@ public class BreedingSkill extends Skill implements Listener {
         if (!(entity instanceof Player player) || player.getUniqueId() != uuid) {
             return;
         }
-        int randomNumber = Utils.getRandomNumber(0, 100);
+        int randomNumber = getRandomNumber(0, 100);
         if (randomNumber <= spawnPercentage) {
             SkillManager.animalBeaconManager.createNewAnimalBeacon(event.getEntity(), initializePotions());
         }
@@ -54,7 +57,7 @@ public class BreedingSkill extends Skill implements Listener {
     private void upgradeSpecialBreedPercent(Player player) {
         int breedingPercentageUpgrade = 1;
         spawnPercentage += breedingPercentageUpgrade;
-        player.sendMessage(Utils.chat("&6Ability Upgraded | Breeding Animal Beacons | Percentage (" + (spawnPercentage - breedingPercentageUpgrade) + " -> " + spawnPercentage + ") %"));
+        player.sendMessage(colorText("&6Ability Upgraded | Breeding Animal Beacons | Percentage (" + (spawnPercentage - breedingPercentageUpgrade) + " -> " + spawnPercentage + ") %"));
     }
 
     @Override

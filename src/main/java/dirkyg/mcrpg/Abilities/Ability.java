@@ -1,13 +1,14 @@
 package dirkyg.mcrpg.Abilities;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Skills.Skill;
-import dirkyg.mcrpg.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
+
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+import static dirkyg.mcrpg.Utilities.Visuals.sendActionBar;
 
 public abstract class Ability {
 
@@ -31,17 +32,17 @@ public abstract class Ability {
             return;
         }
         if (isBeingPrompted && currentTime < nextAvailableUsageTime) {
-            Utils.sendActionBar(player, Utils.chat("&cYou cannot use "
+            sendActionBar(player, "&cYou cannot use "
                     + abilityName + " - " + classifier
                     + " ability for another " + ((nextAvailableUsageTime - currentTime) / 1000)
-                    + " seconds!"));
+                    + " seconds!");
             return;
         }
         if (System.currentTimeMillis() >= resetPromptTime) {
             isBeingPrompted = true;
         }
         if (isBeingPrompted && currentTime >= nextAvailableUsageTime) {
-            Utils.sendActionBar(player, Utils.chat("&d" + actionNeeded + " : Start " + abilityName + " - " + classifier + " Ability"));
+            sendActionBar(player, "&d" + actionNeeded + " : Start " + abilityName + " - " + classifier + " Ability");
             promptInputDelayUtil = currentTime + AFTER_PROMPT_WAIT_TIME;
             isBeingPrompted = false;
             event.setCancelled(true);
@@ -63,7 +64,7 @@ public abstract class Ability {
                     return;
                 }
                 processActionDuringAbility();
-                Utils.sendActionBar(player, Utils.chat("&dYou have " + (((stopTime - System.currentTimeMillis()) / 1000) + 1) + " seconds left on your " + abilityName + " - " + classifier + " ability!"));
+                sendActionBar(player, "&dYou have " + (((stopTime - System.currentTimeMillis()) / 1000) + 1) + " seconds left on your " + abilityName + " - " + classifier + " ability!");
             }
         }.runTaskTimer(McRPG.plugin, 0, 20);
     }
@@ -71,28 +72,8 @@ public abstract class Ability {
     abstract void resetAfterAbilityFinished();
     abstract void processActionDuringAbility();
 
-//    public int getDuration() {
-//        return duration;
-//    }
-//
-//    public void setDuration(int duration) {
-//        this.duration = duration;
-//    }
-//
     public boolean isHappening() {
         return isHappening;
     }
 
-//
-//    public void setHappening(boolean happening) {
-//        isHappening = happening;
-//    }
-//
-//    public long getStopTime() {
-//        return stopTime;
-//    }
-//
-//    public void setStopTime(long stopTime) {
-//        this.stopTime = stopTime;
-//    }
 }

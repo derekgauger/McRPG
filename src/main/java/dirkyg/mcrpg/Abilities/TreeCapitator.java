@@ -1,8 +1,6 @@
 package dirkyg.mcrpg.Abilities;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Skills.Skill;
-import dirkyg.mcrpg.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,6 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import static dirkyg.mcrpg.Utilities.BooleanChecks.*;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
 
 public class TreeCapitator extends Ability implements Listener {
 
@@ -43,7 +44,7 @@ public class TreeCapitator extends Ability implements Listener {
         ItemStack usedItem = player.getInventory().getItemInMainHand();
         Material usedItemType = usedItem.getType();
         Block brokenBlock = event.getBlock();
-        if (Utils.isWood(brokenBlock.getType()) && Utils.isAxe(usedItemType)) {
+        if (isWood(brokenBlock.getType()) && isAxe(usedItemType)) {
             continueTreeCapping = true;
             breakConnectedLogs(brokenBlock, new HashSet<>(), player);
         }
@@ -54,10 +55,10 @@ public class TreeCapitator extends Ability implements Listener {
             return;
         }
         if (checkedBlocks.size() >= MAX_NUM_TREE_CAP_BLOCKS) {
-            player.sendMessage(Utils.chat("&cYou reached the max number of blocks that can be broken with tree-capitator (" + MAX_NUM_TREE_CAP_BLOCKS + ")!"));
+            player.sendMessage(colorText("&cYou reached the max number of blocks that can be broken with tree-capitator (" + MAX_NUM_TREE_CAP_BLOCKS + ")!"));
             continueTreeCapping = false;
         }
-        if (Utils.isLog(block.getType())) {
+        if (isLog(block.getType())) {
             checkedBlocks.add(block);
             block.breakNaturally(player.getInventory().getItemInMainHand());
             ItemStack itemInHand = player.getInventory().getItemInMainHand();
@@ -85,7 +86,7 @@ public class TreeCapitator extends Ability implements Listener {
             int newDurability = item.getDurability() + amount;
             if (newDurability > item.getType().getMaxDurability() || newDurability < 0) {
                 item.setAmount(0);
-                player.sendMessage(Utils.chat("&dYour axe broke!"));
+                player.sendMessage(colorText("&dYour axe broke!"));
                 continueTreeCapping = false;
             } else {
                 item.setDurability((short) newDurability);

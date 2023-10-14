@@ -1,11 +1,12 @@
 package dirkyg.mcrpg.Classes.WarriorClasses;
 
-import dirkyg.mcrpg.Classes.RPGClass;
-import dirkyg.mcrpg.McRPG;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Classes.RPGClass;
 
 public class Elemental extends RPGClass implements Listener {
 

@@ -1,7 +1,11 @@
 package dirkyg.mcrpg.CustomAnimals;
 
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.Common.getRandomNumber;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -9,9 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import dirkyg.mcrpg.McRPG;
 
 public class AnimalBeaconManager {
 
@@ -51,7 +53,7 @@ public class AnimalBeaconManager {
     }
 
     public void createNewAnimalBeacon(Entity entity, List<PotionEffect> availablePotionEffects) {
-        int randomNumber = Utils.getRandomNumber(0, availablePotionEffects.size());
+        int randomNumber = getRandomNumber(0, availablePotionEffects.size());
         PotionEffect randomPotionEffect = availablePotionEffects.get(randomNumber);
         AnimalBeacon animalBeacon = new AnimalBeacon(entity.getUniqueId(), randomPotionEffect);
         animalBeacons.add(animalBeacon);

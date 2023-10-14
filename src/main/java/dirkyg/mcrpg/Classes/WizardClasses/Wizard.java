@@ -1,23 +1,31 @@
 package dirkyg.mcrpg.Classes.WizardClasses;
 
-import dirkyg.mcrpg.Classes.RPGClass;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.Common.addItemToInventory;
+import static dirkyg.mcrpg.Utilities.Common.createGUIItem;
+import static dirkyg.mcrpg.Utilities.Common.getRandomNumber;
+import static dirkyg.mcrpg.Utilities.Common.getTargetEntity;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Classes.RPGClass;
 
 public class Wizard extends RPGClass implements Listener {
 
@@ -28,9 +36,16 @@ public class Wizard extends RPGClass implements Listener {
     private int maxSpellDistance = 120;
     private long spellCoolDownTime = 10000; // 10 seconds
     private long lastSpellUseTime = 0;
+    float damageMultiplier = .5f;
+
+    RPGClass activeClass;
+    FireWizard fireWizard;
+    IceWizard iceWizard;
 
     public Wizard (UUID uuid) {
         this.uuid = uuid;
+        fireWizard = new FireWizard(uuid);
+        iceWizard = new IceWizard(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -38,8 +53,8 @@ public class Wizard extends RPGClass implements Listener {
     public void activatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && !wandGiven) {
-            wand = Utils.createItem(Material.STICK, Utils.chat("&b" + player.getName() + "'s Wand"), 1, new Enchantment[] {Enchantment.MENDING}, new int[] {1});
-            Utils.addItemToInventory(wand, player);
+            wand = createGUIItem(Material.STICK, ("&b" + player.getName() + "'s Wand"), 1);
+            addItemToInventory(wand, player);
             wandGiven = true;
         }
         setCurrentlyActive(true);
@@ -53,7 +68,40 @@ public class Wizard extends RPGClass implements Listener {
 
     @Override
     public void setSubClass(Class subClassType) {
+        if (activeClass != null) {
+            activeClass.deactivatePlayer();
+        }
+        if (subClassType.equals(FireWizard.class)) {
+            activeClass = fireWizard;
+        } else if (subClassType.equals(IceWizard.class)) {
+            activeClass = iceWizard;
+        } else {
+            return;
+        }
+        activeClass.activatePlayer();
+    }
 
+    public void reduceDamage(EntityDamageByEntityEvent event) {
+        Player player = Bukkit.getPlayer(uuid);
+        Entity damager = event.getDamager();
+        if (damager instanceof Arrow arrow) {
+            damager = (Entity) arrow.getShooter();
+        } else if (damager instanceof Trident trident) {
+            damager = (Entity) trident.getShooter();
+        }
+        if (damager == player) {
+            double originalDamage = event.getDamage();
+            double modifiedDamage = originalDamage * damageMultiplier;
+            event.setDamage(modifiedDamage);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
+        if (!isCurrentlyActive()) {
+            return;
+        }
+        reduceDamage(event);
     }
 
     private void processLightningSpell(Player player) {
@@ -62,47 +110,43 @@ public class Wizard extends RPGClass implements Listener {
         if (tb != null) {
             strikeLocation = tb.getLocation();
         } else {
-            Entity entity = Utils.getTargetEntity(player, maxSpellDistance);
+            Entity entity = getTargetEntity(player, maxSpellDistance);
             if (entity != null) {
                 strikeLocation = entity.getLocation();
             }
         }
         if (strikeLocation == null) {
-            player.sendMessage(Utils.chat("&cThe target you have chosen for the spell is too far away!"));
+            player.sendMessage(colorText("&cThe target you have chosen for the spell is too far away!"));
         } else {
-            if (backfirePercentage <= Utils.getRandomNumber(0, 100)) {
+            if (backfirePercentage <= getRandomNumber(0, 100)) {
                 strikeLocation.getWorld().spawnEntity(strikeLocation, EntityType.LIGHTNING);
             } else {
                 player.getWorld().spawnEntity(player.getLocation(), EntityType.LIGHTNING);
-                player.sendMessage(Utils.chat("&cYour lightning spell backfired!"));
+                player.sendMessage(colorText("&cYour lightning spell backfired!"));
             }
         }
     }
 
     private void processFireballSpell(Player player) {
-        if (backfirePercentage <= Utils.getRandomNumber(0, 100)) {
+        if (backfirePercentage <= getRandomNumber(0, 100)) {
             player.launchProjectile(Fireball.class);
         } else {
             player.getWorld().createExplosion(player.getLocation(), 1.3f, true);
-            player.sendMessage(Utils.chat("&cYour fireball spell backfired!"));
+            player.sendMessage(colorText("&cYour fireball spell backfired!"));
         }
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (!isCurrentlyActive()) {
-            return;
-        }
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
+        if (!isCurrentlyActive() || player.getUniqueId() != uuid) {
             return;
         }
         ItemStack item = player.getInventory().getItemInMainHand();
-
         if (item.isSimilar(wand)) {
             long elapsedTimeSinceLastSpell = System.currentTimeMillis() - lastSpellUseTime;
             if (elapsedTimeSinceLastSpell < spellCoolDownTime) {
-                player.sendMessage(Utils.chat("&cYou have to wait " + ((spellCoolDownTime - elapsedTimeSinceLastSpell) / 1000) + " more seconds to use a spell!"));
+                player.sendMessage(colorText("&cYou have to wait " + ((spellCoolDownTime - elapsedTimeSinceLastSpell) / 1000) + " more seconds to use a spell!"));
                 return;
             }
             lastSpellUseTime = System.currentTimeMillis();

@@ -1,7 +1,7 @@
 package dirkyg.mcrpg.Classes.WarriorClasses;
 
-import dirkyg.mcrpg.Classes.RPGClass;
-import dirkyg.mcrpg.McRPG;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -12,7 +12,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Classes.RPGClass;
 
 public class Berserker extends RPGClass implements Listener {
 

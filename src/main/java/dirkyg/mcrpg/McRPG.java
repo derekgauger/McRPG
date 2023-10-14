@@ -1,18 +1,20 @@
 package dirkyg.mcrpg;
 
-import dirkyg.mcrpg.Classes.ClassManager;
-import dirkyg.mcrpg.Skills.SkillManager;
-import dirkyg.mcrpg.WorldGeneration.SchematicWorldGenerator;
+import java.io.File;
+import java.io.IOException;
+
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
-import java.io.IOException;
+import dirkyg.mcrpg.Classes.ClassManager;
+import dirkyg.mcrpg.Skills.SkillManager;
+import dirkyg.mcrpg.Utilities.Listeners;
+import dirkyg.mcrpg.WorldGeneration.SchematicWorldGenerator;
 
 public final class McRPG extends JavaPlugin {
 
     public static McRPG plugin;
-
+    
     @Override
     public void onEnable() {
         plugin = this;
@@ -24,13 +26,12 @@ public final class McRPG extends JavaPlugin {
                 System.out.println("Plugin data folder creation failed!");
             }
         } else {
-            System.out.println("Plugin data folder exists!!");
+            System.out.println("Plugin data folder exists!");
         }
-
-        new Utils(this);
-        new ClassManager(this);
+        new Listeners();
+        new ClassManager();
         new SkillManager();
-        new SchematicWorldGenerator(this);
+        new SchematicWorldGenerator();
         new BukkitRunnable() {
             @Override
             public void run() {

@@ -1,10 +1,15 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.Common.getRandomNumber;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+import static dirkyg.mcrpg.Utilities.Visuals.sendActionBar;
+
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.*;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -12,7 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
 
 public class CommerceSkill extends Skill implements Listener {
 
@@ -44,10 +49,10 @@ public class CommerceSkill extends Skill implements Listener {
                 ItemStack firstTradeSlot = inventory.getContents()[0];
                 ItemStack secondTradeSlot = inventory.getContents()[0];
                 if (firstTradeSlot.getType() != Material.EMERALD && secondTradeSlot.getType() != Material.EMERALD) {
-                    int randomNumber = Utils.getRandomNumber(0, 100);
+                    int randomNumber = getRandomNumber(0, 100);
                     if (randomNumber < percentChanceCashBack) {
                         player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(Material.EMERALD));
-                        Utils.sendActionBar(player, Utils.chat("&dYou got some cash back!"));
+                        sendActionBar(player, "&dYou got some cash back!");
                     }
                 }
                 SkillManager.processSkillIncrement(player, this, 3);
@@ -58,7 +63,7 @@ public class CommerceSkill extends Skill implements Listener {
     private void upgradeCashBackPercentage(Player player) {
         int cashBackPercentageUpgrade = 2;
         percentChanceCashBack += cashBackPercentageUpgrade;
-        player.sendMessage(Utils.chat("&6Ability Upgraded | Commerce Cash Back | Percentage (" + (percentChanceCashBack - cashBackPercentageUpgrade) + " -> " + percentChanceCashBack + ") %"));
+        player.sendMessage(colorText("&6Ability Upgraded | Commerce Cash Back | Percentage (" + (percentChanceCashBack - cashBackPercentageUpgrade) + " -> " + percentChanceCashBack + ") %"));
     }
 
     @Override

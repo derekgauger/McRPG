@@ -1,12 +1,12 @@
 package dirkyg.mcrpg.Classes;
 
+import java.util.UUID;
+
 import dirkyg.mcrpg.Classes.HealerClasses.Healer;
 import dirkyg.mcrpg.Classes.RangerClasses.Ranger;
 import dirkyg.mcrpg.Classes.RogueClasses.Rogue;
 import dirkyg.mcrpg.Classes.WarriorClasses.Warrior;
 import dirkyg.mcrpg.Classes.WizardClasses.Wizard;
-
-import java.util.UUID;
 
 public class PlayerClasses {
 

@@ -1,8 +1,10 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.Abilities.CropCircle;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isCrop;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +18,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Abilities.CropCircle;
 
 public class FarmingSkill extends Skill implements Listener {
 
@@ -39,7 +42,7 @@ public class FarmingSkill extends Skill implements Listener {
         Player player = event.getPlayer();
         ItemStack currentItem = player.getInventory().getItemInMainHand();
         Material currentItemType = currentItem.getType();
-        if (player.getUniqueId() != uuid || !player.isSneaking() || cropCircle.isHappening() || !Utils.isCrop(currentItemType)) {
+        if (player.getUniqueId() != uuid || !player.isSneaking() || cropCircle.isHappening() || !isCrop(currentItemType)) {
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -52,7 +55,7 @@ public class FarmingSkill extends Skill implements Listener {
         Player player = event.getPlayer();
         Block brokenBlock = event.getBlock();
         BlockData blockData = brokenBlock.getBlockData();
-        if (Utils.isCrop(brokenBlock.getType()) && (blockData instanceof Ageable ageableCrop)) {
+        if (isCrop(brokenBlock.getType()) && (blockData instanceof Ageable ageableCrop)) {
             if (ageableCrop.getAge() == ageableCrop.getMaximumAge()) {
                 SkillManager.processSkillIncrement(player, this, 2);
             }
@@ -62,13 +65,13 @@ public class FarmingSkill extends Skill implements Listener {
     private void upgradeCropTime(Player player) {
         int cropTimeUpgrade = 3;
         cropCircle.duration += cropTimeUpgrade;
-        player.sendMessage(Utils.chat("&6Ability Upgraded | " + cropCircle + " | Duration (" + (cropCircle.duration - cropTimeUpgrade) + " -> " + cropCircle.duration + ") seconds"));
+        player.sendMessage(colorText("&6Ability Upgraded | " + cropCircle + " | Duration (" + (cropCircle.duration - cropTimeUpgrade) + " -> " + cropCircle.duration + ") seconds"));
     }
 
     private void upgradeCropRadius(Player player) {
         int cropRadius = 1;
         cropCircle.radius += cropRadius;
-        player.sendMessage(Utils.chat("&6Ability Upgraded | " + cropCircle + " | Radius (" + (cropCircle.radius - cropRadius) + " -> " + cropCircle.radius + ")"));
+        player.sendMessage(colorText("&6Ability Upgraded | " + cropCircle + " | Radius (" + (cropCircle.radius - cropRadius) + " -> " + cropCircle.radius + ")"));
     }
 
     @Override

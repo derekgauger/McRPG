@@ -1,7 +1,11 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isCrop;
+import static dirkyg.mcrpg.Utilities.Common.getRandomNumber;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,7 +16,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
 
 public class BuildingSkill extends Skill implements Listener {
 
@@ -33,11 +37,11 @@ public class BuildingSkill extends Skill implements Listener {
         Player player = event.getPlayer();
         Block block = event.getBlockPlaced();
         block.setMetadata("playerPlaced", new FixedMetadataValue(McRPG.plugin, true));
-        if (player.getUniqueId() != uuid || Utils.isCrop(block.getType())) {
+        if (player.getUniqueId() != uuid || isCrop(block.getType())) {
             return;
         }
         if (block.getType().isSolid()) {
-            int randomNumber = Utils.getRandomNumber(0, 100);
+            int randomNumber = getRandomNumber(0, 100);
             if (randomNumber < percentJumpBoostChance) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, 1));
             }
@@ -48,7 +52,7 @@ public class BuildingSkill extends Skill implements Listener {
     private void upgradeJumpBoostPercentage(Player player) {
         int buildingPercentageUpgrade = 2;
         percentJumpBoostChance += buildingPercentageUpgrade;
-        player.sendMessage(Utils.chat("&6Ability Upgraded | Building Jump Boost | Percentage (" + (percentJumpBoostChance - buildingPercentageUpgrade) + " -> " + percentJumpBoostChance + ") %"));
+        player.sendMessage(colorText("&6Ability Upgraded | Building Jump Boost | Percentage (" + (percentJumpBoostChance - buildingPercentageUpgrade) + " -> " + percentJumpBoostChance + ") %"));
     }
 
     @Override

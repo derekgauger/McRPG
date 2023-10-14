@@ -1,8 +1,8 @@
 package dirkyg.mcrpg.CustomAnimals;
 
-import org.bukkit.potion.PotionEffect;
-
 import java.util.UUID;
+
+import org.bukkit.potion.PotionEffect;
 
 public class AnimalBeacon {
 

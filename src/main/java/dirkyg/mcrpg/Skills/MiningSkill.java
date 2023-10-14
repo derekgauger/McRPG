@@ -1,11 +1,13 @@
 package dirkyg.mcrpg.Skills;
 
-import dirkyg.mcrpg.Abilities.Ability;
-import dirkyg.mcrpg.Abilities.EntityReveal;
-import dirkyg.mcrpg.Abilities.InstaBreak;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
-import org.bukkit.*;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isMineMat;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isPickaxe;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,9 +16,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.UUID;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Abilities.Ability;
+import dirkyg.mcrpg.Abilities.InstaBreak;
 
 public class MiningSkill extends Skill implements Listener {
 
@@ -38,7 +41,7 @@ public class MiningSkill extends Skill implements Listener {
         Player player = event.getPlayer();
         ItemStack currentItem = player.getInventory().getItemInMainHand();
         Material currentItemType = currentItem.getType();
-        if (player.getUniqueId() != uuid || !Utils.isPickaxe(currentItemType) || !player.isSneaking() || instaBreak.isHappening()) {
+        if (player.getUniqueId() != uuid || !isPickaxe(currentItemType) || !player.isSneaking() || instaBreak.isHappening()) {
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -55,7 +58,7 @@ public class MiningSkill extends Skill implements Listener {
         ItemStack usedItem = player.getInventory().getItemInMainHand();
         Material usedItemType = usedItem.getType();
         Block brokenBlock = event.getBlock();
-        if (Utils.isMineMat(brokenBlock.getType()) && Utils.isPickaxe(usedItemType)) {
+        if (isMineMat(brokenBlock.getType()) && isPickaxe(usedItemType)) {
             SkillManager.processSkillIncrement(player, this, 1);
         }
     }
@@ -79,7 +82,7 @@ public class MiningSkill extends Skill implements Listener {
                 if (player == null) {
                     return;
                 }
-                player.sendMessage(Utils.chat("&6Ability Upgraded | " + instaBreak + " | Duration (" + (instaBreak.duration - instaBreakTimeUpgrade) + " -> " + instaBreak.duration + ") seconds"));
+                player.sendMessage(colorText("&6Ability Upgraded | " + instaBreak + " | Duration (" + (instaBreak.duration - instaBreakTimeUpgrade) + " -> " + instaBreak.duration + ") seconds"));
         }
     }
 }

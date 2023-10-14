@@ -1,22 +1,10 @@
 package dirkyg.mcrpg.Classes;
 
-import dirkyg.mcrpg.Classes.HealerClasses.Cleric;
-import dirkyg.mcrpg.Classes.HealerClasses.Healer;
-import dirkyg.mcrpg.Classes.HealerClasses.Necromancer;
-import dirkyg.mcrpg.Classes.RangerClasses.Hunter;
-import dirkyg.mcrpg.Classes.RangerClasses.Ranger;
-import dirkyg.mcrpg.Classes.RangerClasses.Sniper;
-import dirkyg.mcrpg.Classes.RogueClasses.Assassin;
-import dirkyg.mcrpg.Classes.RogueClasses.Rogue;
-import dirkyg.mcrpg.Classes.RogueClasses.Trickster;
-import dirkyg.mcrpg.Classes.WarriorClasses.Berserker;
-import dirkyg.mcrpg.Classes.WarriorClasses.Elemental;
-import dirkyg.mcrpg.Classes.WarriorClasses.Warrior;
-import dirkyg.mcrpg.Classes.WizardClasses.Fire;
-import dirkyg.mcrpg.Classes.WizardClasses.Ice;
-import dirkyg.mcrpg.Classes.WizardClasses.Wizard;
-import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Utils;
+import static dirkyg.mcrpg.Utilities.Common.createGUIItem;
+
+import java.util.HashMap;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -30,10 +18,22 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.HashMap;
-import java.util.UUID;
-
-import static dirkyg.mcrpg.Utils.createItem;
+import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Classes.HealerClasses.Cleric;
+import dirkyg.mcrpg.Classes.HealerClasses.Healer;
+import dirkyg.mcrpg.Classes.HealerClasses.Necromancer;
+import dirkyg.mcrpg.Classes.RangerClasses.Hunter;
+import dirkyg.mcrpg.Classes.RangerClasses.Ranger;
+import dirkyg.mcrpg.Classes.RangerClasses.Sniper;
+import dirkyg.mcrpg.Classes.RogueClasses.Assassin;
+import dirkyg.mcrpg.Classes.RogueClasses.Rogue;
+import dirkyg.mcrpg.Classes.RogueClasses.Trickster;
+import dirkyg.mcrpg.Classes.WarriorClasses.Berserker;
+import dirkyg.mcrpg.Classes.WarriorClasses.Elemental;
+import dirkyg.mcrpg.Classes.WarriorClasses.Warrior;
+import dirkyg.mcrpg.Classes.WizardClasses.FireWizard;
+import dirkyg.mcrpg.Classes.WizardClasses.IceWizard;
+import dirkyg.mcrpg.Classes.WizardClasses.Wizard;
 
 public class ClassManager implements Listener, CommandExecutor {
 
@@ -41,9 +41,9 @@ public class ClassManager implements Listener, CommandExecutor {
     public static HashMap<UUID, PlayerClasses> charactersClasses = new HashMap<>();
     public static HashMap<UUID, RPGClass> activeClasses = new HashMap<>();
 
-    public ClassManager(McRPG plugin) {
+    public ClassManager() {
         Bukkit.getServer().getPluginCommand("class").setExecutor(this);
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
+        Bukkit.getServer().getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
     @Override
@@ -153,12 +153,12 @@ public class ClassManager implements Listener, CommandExecutor {
                     activeClasses.put(player.getUniqueId(), healer);
                     break;
                 case BLAZE_POWDER:
-                    wizard.setSubClass(Fire.class);
+                    wizard.setSubClass(FireWizard.class);
                     wizard.activatePlayer();
                     activeClasses.put(player.getUniqueId(), wizard);
                     break;
                 case ICE:
-                    wizard.setSubClass(Ice.class);
+                    wizard.setSubClass(IceWizard.class);
                     wizard.activatePlayer();
                     activeClasses.put(player.getUniqueId(), wizard);
                     break;
@@ -171,38 +171,38 @@ public class ClassManager implements Listener, CommandExecutor {
 
     private Inventory getClassSelectionGUI() {
         Inventory inv = Bukkit.createInventory(null, 9, "Select a Class");
-        inv.setItem(0, createItem(Material.NETHERITE_AXE, Utils.chat("&6&lWarrior"), 1, null, null));
-        inv.setItem(1, createItem(Material.FEATHER, Utils.chat("&b&lRogue"), 1, null, null));
-        inv.setItem(2, createItem(Material.BOW, Utils.chat("&a&lRanger"), 1, null, null));
-        inv.setItem(3, createItem(Material.GOLDEN_APPLE, Utils.chat("&d&lHealer"), 1, null, null));
-        inv.setItem(4, createItem(Material.STICK, Utils.chat("&5&lWizard"), 1, null, null));
-        inv.setItem(8, createItem(Material.BARRIER, Utils.chat("&c&lExit"), 1, null, null));
+        inv.setItem(0, createGUIItem(Material.NETHERITE_AXE, "&6&lWarrior", 1));
+        inv.setItem(1, createGUIItem(Material.FEATHER, "&b&lRogue", 1));
+        inv.setItem(2, createGUIItem(Material.BOW, "&a&lRanger", 1));
+        inv.setItem(3, createGUIItem(Material.GOLDEN_APPLE, "&d&lHealer", 1));
+        inv.setItem(4, createGUIItem(Material.STICK, "&5&lWizard", 1));
+        inv.setItem(8, createGUIItem(Material.BARRIER, "&c&lExit", 1));
         return inv;
     }
 
     private Inventory getSubClassSelectionGUI(String className) {
         Inventory inv = Bukkit.createInventory(null, 9, "Select a Subclass for " + className);
         if (className.contains("Warrior")) {
-            inv.setItem(0, createItem(Material.END_CRYSTAL, Utils.chat("Elemental"), 1, null, null));
-            inv.setItem(1, createItem(Material.NETHERITE_SWORD, Utils.chat("Berserker"), 1, null, null));
+            inv.setItem(0, createGUIItem(Material.END_CRYSTAL, "&6&lElemental", 1));
+            inv.setItem(1, createGUIItem(Material.NETHERITE_SWORD, "&6&lBerserker", 1));
         }
         if (className.contains("Rogue")) {
-            inv.setItem(0, createItem(Material.IRON_SWORD, Utils.chat("Assassin"), 1, null, null));
-            inv.setItem(1, createItem(Material.ENDER_PEARL, Utils.chat("Trickster"), 1, null, null));
+            inv.setItem(0, createGUIItem(Material.IRON_SWORD, "&b&lAssassin", 1));
+            inv.setItem(1, createGUIItem(Material.ENDER_PEARL, "&b&lTrickster", 1));
         }
         if (className.contains("Ranger")) {
-            inv.setItem(0, createItem(Material.SPYGLASS, Utils.chat("Sniper"), 1, null, null));
-            inv.setItem(1, createItem(Material.BOW, Utils.chat("Hunter"), 1, null, null));
+            inv.setItem(0, createGUIItem(Material.SPYGLASS, "&a&lSniper", 1));
+            inv.setItem(1, createGUIItem(Material.BOW, "&a&lHunter", 1));
         }
         if (className.contains("Healer")) {
-            inv.setItem(0, createItem(Material.ENCHANTED_GOLDEN_APPLE, Utils.chat("Cleric"), 1, null, null));
-            inv.setItem(1, createItem(Material.CHORUS_FRUIT, Utils.chat("Necromancer"), 1, null, null));
+            inv.setItem(0, createGUIItem(Material.ENCHANTED_GOLDEN_APPLE, "&d&lCleric", 1));
+            inv.setItem(1, createGUIItem(Material.CHORUS_FRUIT, "&d&lNecromancer", 1));
         }
         if (className.contains("Wizard")) {
-            inv.setItem(0, createItem(Material.BLAZE_POWDER, Utils.chat("Fire Wizard"), 1, null, null));
-            inv.setItem(1, createItem(Material.ICE, Utils.chat("Ice Wizard"), 1, null, null));
+            inv.setItem(0, createGUIItem(Material.BLAZE_POWDER, "&5&lFire Wizard", 1));
+            inv.setItem(1, createGUIItem(Material.ICE, "&5&lIce Wizard", 1));
         }
-        inv.setItem(8, createItem(Material.ARROW, Utils.chat("&6Back one page"), 1, null, null));
+        inv.setItem(8, createGUIItem(Material.ARROW, "&6Back one page", 1));
         return inv;
     }
 
@@ -264,7 +264,7 @@ public class ClassManager implements Listener, CommandExecutor {
 //        if (newlyActivated != null) {
 //            newlyActivated.activatePlayer();
 //            activeClasses.put(playerUUID, newlyActivated);
-//            player.sendMessage(Utils.chat(activateMsg));
+//            player.sendMessage(activateMsg));
 //        }
 //        initializeClassGUI(player);
 //    }
