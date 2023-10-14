@@ -1,35 +1,53 @@
-package dirkyg.mcrpg.Classes;
+package dirkyg.mcrpg.Classes.WarriorClasses;
 
+import dirkyg.mcrpg.Abilities.Ability;
+import dirkyg.mcrpg.Abilities.Dash;
+import dirkyg.mcrpg.Classes.RPGClass;
+import dirkyg.mcrpg.Classes.WarriorClasses.Berserker;
+import dirkyg.mcrpg.Classes.WarriorClasses.Elemental;
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
 public class Warrior extends RPGClass implements Listener {
 
     UUID uuid;
-    private final double damageMultiplier = 2.0;
-    private float baseSpeed = .15f;
-    private float fastWalkSpeed = .3f;
-    private long immunityDuration = 10000; // seconds
+    private final float damageMultiplier = 2.0f;
+    private final float baseSpeed = .13f;
+    private final long immunityDuration = 10000; // seconds
+    private final long immunityCooldown = 5 * 60 * 1000;
     private long immuneUntil = 0;
-    private long immunityCooldown = 5 * 60 * 1000;
     private long immunityCooldownResetTime = 0;
+    private float projectileReductionMultiplier = .5f;
+
+    RPGClass activeClass;
+    Berserker berserker;
+    Elemental elemental;
+
+    Ability dash;
 
     public Warrior(UUID uuid) {
         this.uuid = uuid;
+        berserker = new Berserker(uuid);
+        elemental = new Elemental(uuid);
+        dash = new Dash(uuid, this.toString());
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
+    }
+
+    @Override
+    public String toString() {
+        return "Warrior";
     }
 
     @Override
@@ -40,11 +58,10 @@ public class Warrior extends RPGClass implements Listener {
             player.setMaxHealth(32.0);
         }
         setCurrentlyActive(true);
-
     }
 
     @Override
-    void deactivatePlayer() {
+    public void deactivatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             player.setWalkSpeed(.2f);
@@ -53,12 +70,40 @@ public class Warrior extends RPGClass implements Listener {
         setCurrentlyActive(false);
     }
 
+    @Override
+    public void setSubClass(Class subClassType) {
+        if (activeClass != null) {
+            activeClass.deactivatePlayer();
+        }
+        if (subClassType.equals(Berserker.class)) {
+            activeClass = berserker;
+        } else if (subClassType.equals(Elemental.class)) {
+            activeClass = elemental;
+        } else {
+            return;
+        }
+        activeClass.activatePlayer();
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!isCurrentlyActive()) {
+            return;
+        }
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+        if (item == null || !Utils.isSword(item.getType()) || !player.isSneaking() || dash.isHappening()) {
+            return;
+        }
+        if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+            dash.processAbility(event, player, "Right Click");
+        }
+    }
+
     public void processPlayerDamageMultiplier(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
         Entity damager = event.getDamager();
-        if (damager instanceof Arrow arrow) {
-            damager = (Entity) arrow.getShooter();
-        } else if (damager instanceof Trident trident) {
+        if (damager instanceof Trident trident) {
             damager = (Entity) trident.getShooter();
         }
         if (damager == player) {
@@ -68,27 +113,16 @@ public class Warrior extends RPGClass implements Listener {
         }
     }
 
-    public void processCounterKnockback(EntityDamageByEntityEvent event) {
+    public void processPlayerProjectileDamageReduction(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
-        Entity damaged = event.getEntity();
         Entity damager = event.getDamager();
-        if (damager instanceof LivingEntity && !(damager instanceof Player) && player == damaged) {
-            Vector knockback = damager.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
-            knockback.setY(0.5);
-            knockback.multiply(0.9f);
-            damager.setVelocity(knockback);
+        if (damager instanceof Arrow arrow) {
+            damager = (Entity) arrow.getShooter();
         }
-    }
-
-    public void processNoKnockback(EntityDamageByEntityEvent event) {
-        Player player = Bukkit.getPlayer(uuid);
-        Entity damaged = event.getEntity();
-        Entity damager = event.getDamager();
-        if (damager instanceof LivingEntity && !(damager instanceof Player) && player == damaged) {
-            event.setCancelled(true);
-            double newHealth = player.getHealth() - event.getFinalDamage();
-            if (newHealth < 0) newHealth = 0;
-            player.setHealth(newHealth);
+        if (damager == player) {
+            double originalDamage = event.getDamage();
+            double modifiedDamage = originalDamage * projectileReductionMultiplier;
+            event.setDamage(modifiedDamage);
         }
     }
 
@@ -114,30 +148,12 @@ public class Warrior extends RPGClass implements Listener {
     }
 
     @EventHandler
-    public void processFasterSpeed(PlayerMoveEvent event) {
-        if (!isCurrentlyActive()) {
-            return;
-        }
-        Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
-        ItemStack currentItem = player.getInventory().getItemInMainHand();
-        if (Utils.isSword(currentItem.getType())) {
-            player.setWalkSpeed(fastWalkSpeed);
-        } else {
-            player.setWalkSpeed(baseSpeed);
-        }
-    }
-
-    @EventHandler
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
         if (!isCurrentlyActive()) {
             return;
         }
         processPlayerDamageMultiplier(event);
-        processCounterKnockback(event);
-        processNoKnockback(event);
         processPlayerHealthTooLow(event);
+        processPlayerProjectileDamageReduction(event);
     }
 }

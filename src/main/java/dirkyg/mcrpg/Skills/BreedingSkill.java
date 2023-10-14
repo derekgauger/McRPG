@@ -17,7 +17,6 @@ import java.util.UUID;
 
 public class BreedingSkill extends Skill implements Listener {
 
-
     private int spawnPercentage = 100;
 
     public BreedingSkill(UUID uuid) {
@@ -42,10 +41,7 @@ public class BreedingSkill extends Skill implements Listener {
     @EventHandler
     public void onEntityBreed(EntityBreedEvent event) {
         LivingEntity entity = event.getBreeder();
-        if (!(entity instanceof Player player)) {
-            return;
-        }
-        if (player.getUniqueId() != uuid) {
+        if (!(entity instanceof Player player) || player.getUniqueId() != uuid) {
             return;
         }
         int randomNumber = Utils.getRandomNumber(0, 100);

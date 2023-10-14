@@ -19,7 +19,7 @@ public abstract class Ability {
     boolean isHappening;
     long stopTime;
     long promptInputDelayUtil;
-    Skill skill;
+    String classifier;
     String abilityName;
     boolean isBeingPrompted = true;
 
@@ -32,7 +32,7 @@ public abstract class Ability {
         }
         if (isBeingPrompted && currentTime < nextAvailableUsageTime) {
             Utils.sendActionBar(player, Utils.chat("&cYou cannot use "
-                    + abilityName + " - " + skill.toString()
+                    + abilityName + " - " + classifier
                     + " ability for another " + ((nextAvailableUsageTime - currentTime) / 1000)
                     + " seconds!"));
             return;
@@ -41,7 +41,7 @@ public abstract class Ability {
             isBeingPrompted = true;
         }
         if (isBeingPrompted && currentTime >= nextAvailableUsageTime) {
-            Utils.sendActionBar(player, Utils.chat("&d" + actionNeeded + " : Start " + abilityName + " - " + skill.toString() + " ability"));
+            Utils.sendActionBar(player, Utils.chat("&d" + actionNeeded + " : Start " + abilityName + " - " + classifier + " Ability"));
             promptInputDelayUtil = currentTime + AFTER_PROMPT_WAIT_TIME;
             isBeingPrompted = false;
             event.setCancelled(true);
@@ -63,7 +63,7 @@ public abstract class Ability {
                     return;
                 }
                 processActionDuringAbility();
-                Utils.sendActionBar(player, Utils.chat("&dYou have " + (((stopTime - System.currentTimeMillis()) / 1000) + 1) + " seconds left on your " + abilityName + " - " + skill.toString()+ " ability!"));
+                Utils.sendActionBar(player, Utils.chat("&dYou have " + (((stopTime - System.currentTimeMillis()) / 1000) + 1) + " seconds left on your " + abilityName + " - " + classifier + " ability!"));
             }
         }.runTaskTimer(McRPG.plugin, 0, 20);
     }

@@ -31,14 +31,8 @@ public class CommerceSkill extends Skill implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         HumanEntity entity = event.getWhoClicked();
-        if (!(entity instanceof Player player)) {
-            return;
-        }
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
         Inventory inventory = event.getClickedInventory();
-        if (inventory == null) {
+        if (!(entity instanceof Player player) || player.getUniqueId() != uuid || inventory == null) {
             return;
         }
         ItemStack currentItem = event.getCurrentItem();

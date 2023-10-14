@@ -1,13 +1,17 @@
 package dirkyg.mcrpg.Classes;
 
+import java.util.UUID;
+
 public abstract class RPGClass {
 
-    private int level = 1;
+    public UUID uuid;
+    public int level = 1;
+    public double totalXp = 0;
     private boolean isActive = false;
-    private double totalXp;
 
-    abstract void activatePlayer();
-    abstract void deactivatePlayer();
+    public abstract void activatePlayer();
+    public abstract void deactivatePlayer();
+    public abstract void setSubClass(Class subClassType);
 
     public void incrementLevel() {
         this.level += 1;

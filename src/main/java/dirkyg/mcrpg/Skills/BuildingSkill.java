@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -30,11 +31,9 @@ public class BuildingSkill extends Skill implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
         Block block = event.getBlockPlaced();
-        if (Utils.isCrop(block.getType())) {
+        block.setMetadata("playerPlaced", new FixedMetadataValue(McRPG.plugin, true));
+        if (player.getUniqueId() != uuid || Utils.isCrop(block.getType())) {
             return;
         }
         if (block.getType().isSolid()) {

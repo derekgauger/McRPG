@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public class SuperSwim extends Ability {
 
-    public SuperSwim(UUID uuid, Skill skill) {
+    public SuperSwim(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
     }
 

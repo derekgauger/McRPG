@@ -4,8 +4,6 @@ main: dirkyg.mcrpg.McRPG
 api-version: 1.20
 authors: [ DirkyG ]
 description: Plugin I made
-depend:
-  - ProtocolLib
 commands:
   class:
     description: Allows the user to pick a class to use

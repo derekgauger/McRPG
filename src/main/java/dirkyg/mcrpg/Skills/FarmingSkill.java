@@ -24,7 +24,7 @@ public class FarmingSkill extends Skill implements Listener {
 
     public FarmingSkill(UUID uuid) {
         super.uuid = uuid;
-        cropCircle = new CropCircle(uuid, this);
+        cropCircle = new CropCircle(uuid, this.toString());
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -37,18 +37,9 @@ public class FarmingSkill extends Skill implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
-        if (!player.isSneaking()) {
-            return;
-        }
-        if (cropCircle.isHappening()) {
-            return;
-        }
         ItemStack currentItem = player.getInventory().getItemInMainHand();
         Material currentItemType = currentItem.getType();
-        if (!Utils.isCrop(currentItemType)) {
+        if (player.getUniqueId() != uuid || !player.isSneaking() || cropCircle.isHappening() || !Utils.isCrop(currentItemType)) {
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_AIR) {

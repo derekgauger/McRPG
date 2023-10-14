@@ -18,9 +18,9 @@ public class HomingArrows extends Ability implements Listener {
 
     public float arrowSpeed = 3.5f;
 
-    public HomingArrows(UUID uuid, Skill skill) {
+    public HomingArrows(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -33,13 +33,7 @@ public class HomingArrows extends Ability implements Listener {
     @EventHandler
     public void onArrowShoot(ProjectileLaunchEvent event) {
         ProjectileSource shooter = event.getEntity().getShooter();
-        if (!(shooter instanceof Entity entityShooter)) {
-            return;
-        }
-        if (entityShooter.getUniqueId() != playerUUID) {
-            return;
-        }
-        if (!isHappening) {
+        if (!(shooter instanceof Entity entityShooter) || entityShooter.getUniqueId() != playerUUID || !isHappening) {
             return;
         }
         if (event.getEntity() instanceof Arrow arrow && entityShooter instanceof Player player) {

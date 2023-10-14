@@ -22,9 +22,9 @@ public class TreeCapitator extends Ability implements Listener {
     private final int MAX_NUM_TREE_CAP_BLOCKS = 100;
     private boolean continueTreeCapping;
 
-    public TreeCapitator(UUID uuid, Skill skill) {
+    public TreeCapitator(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -37,13 +37,7 @@ public class TreeCapitator extends Ability implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != playerUUID) {
-            return;
-        }
-        if (!isHappening) {
-            return;
-        }
-        if (player.isSneaking()) {
+        if (player.getUniqueId() != playerUUID || !isHappening || player.isSneaking()) {
             return;
         }
         ItemStack usedItem = player.getInventory().getItemInMainHand();
@@ -56,10 +50,7 @@ public class TreeCapitator extends Ability implements Listener {
     }
 
     private void breakConnectedLogs(Block block, Set<Block> checkedBlocks, Player player) {
-        if (!continueTreeCapping) {
-            return;
-        }
-        if (checkedBlocks.contains(block)) {
+        if (!continueTreeCapping || checkedBlocks.contains(block)) {
             return;
         }
         if (checkedBlocks.size() >= MAX_NUM_TREE_CAP_BLOCKS) {

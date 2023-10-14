@@ -13,9 +13,9 @@ public class EntityReveal extends Ability{
 
     HashSet<UUID> glowingEntities;
 
-    public EntityReveal(UUID uuid, Skill skill) {
+    public EntityReveal(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
         glowingEntities = new HashSet<>();
     }

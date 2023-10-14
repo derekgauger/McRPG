@@ -1,5 +1,6 @@
-package dirkyg.mcrpg.Classes;
+package dirkyg.mcrpg.Classes.WizardClasses;
 
+import dirkyg.mcrpg.Classes.RPGClass;
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Utils;
 import org.bukkit.Bukkit;
@@ -45,9 +46,14 @@ public class Wizard extends RPGClass implements Listener {
     }
 
     @Override
-    void deactivatePlayer() {
+    public void deactivatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
         setCurrentlyActive(false);
+    }
+
+    @Override
+    public void setSubClass(Class subClassType) {
+
     }
 
     private void processLightningSpell(Player player) {

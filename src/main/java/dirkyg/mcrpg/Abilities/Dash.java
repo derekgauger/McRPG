@@ -19,9 +19,9 @@ public class Dash extends Ability implements Listener {
     private long dashCoolDown = 2;
     private long nextAvailableUsage;
 
-    public Dash(UUID uuid, Skill skill) {
+    public Dash(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -34,20 +34,8 @@ public class Dash extends Ability implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != playerUUID) {
-            return;
-        }
-        if (!isHappening) {
-            return;
-        }
         ItemStack item = event.getItem();
-        if (item == null) {
-            return;
-        }
-        if (player.isSneaking()) {
-            return;
-        }
-        if (System.currentTimeMillis() < nextAvailableUsage) {
+        if (player.getUniqueId() != playerUUID || !isHappening || item == null || player.isSneaking() || System.currentTimeMillis() < nextAvailableUsage) {
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_AIR && Utils.isSword(item.getType())) {

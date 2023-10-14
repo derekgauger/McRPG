@@ -10,23 +10,21 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.UUID;
 
 public class MiningSkill extends Skill implements Listener {
 
-    Ability activeAbility;
-    InstaBreak instaBreak;
-    EntityReveal entityReveal;
+    Ability instaBreak;
 
     public MiningSkill(UUID uuid) {
         super.uuid = uuid;
-        instaBreak = new InstaBreak(uuid, this);
-        entityReveal = new EntityReveal(uuid, this);
-        activeAbility = instaBreak;
+        instaBreak = new InstaBreak(uuid, this.toString());
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -38,35 +36,13 @@ public class MiningSkill extends Skill implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
         ItemStack currentItem = player.getInventory().getItemInMainHand();
         Material currentItemType = currentItem.getType();
-        if (!Utils.isPickaxe(currentItemType)) {
+        if (player.getUniqueId() != uuid || !Utils.isPickaxe(currentItemType) || !player.isSneaking() || instaBreak.isHappening()) {
             return;
         }
-        if (!player.isSneaking()) {
-            return;
-        }
-        if (activeAbility.isHappening()) {
-            return;
-        }
-        switch (event.getAction()) {
-            case RIGHT_CLICK_BLOCK -> {
-                activeAbility.processAbility(event, player, "Right Click");
-            }
-            case RIGHT_CLICK_AIR -> {
-                if (instaBreak.isHappening() || entityReveal.isHappening()) {
-                    return;
-                }
-                if (activeAbility instanceof InstaBreak) {
-                    activeAbility = entityReveal;
-                } else if (activeAbility instanceof EntityReveal) {
-                    activeAbility = instaBreak;
-                }
-                Utils.sendActionBar(player, Utils.chat("&dYour pickaxe ability is now in " + activeAbility.toString() + " mode!"));
-            }
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            instaBreak.processAbility(event, player, "Right Click");
         }
     }
 
@@ -99,14 +75,11 @@ public class MiningSkill extends Skill implements Listener {
             case 45:
             case 50:
                 int instaBreakTimeUpgrade = 3;
-                int entityRevealTimeUpgrade = 3;
                 instaBreak.duration += instaBreakTimeUpgrade;
-                entityReveal.duration += entityRevealTimeUpgrade;
                 if (player == null) {
                     return;
                 }
                 player.sendMessage(Utils.chat("&6Ability Upgraded | " + instaBreak + " | Duration (" + (instaBreak.duration - instaBreakTimeUpgrade) + " -> " + instaBreak.duration + ") seconds"));
-                player.sendMessage(Utils.chat("&6Ability Upgraded | " + entityReveal + " | Duration (" + (entityReveal.duration - entityRevealTimeUpgrade) + " -> " + entityReveal.duration + ") seconds"));
         }
     }
 }

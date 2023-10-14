@@ -15,7 +15,6 @@ public final class McRPG extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        System.out.println("Starting the plugin!!!!!!");
         plugin = this;
         File folder = new File(plugin.getDataFolder().getAbsolutePath());
         if (!folder.exists()) {

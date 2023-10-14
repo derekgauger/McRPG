@@ -15,9 +15,9 @@ import java.util.UUID;
 
 public class ExcavationRun extends Ability implements Listener {
 
-    public ExcavationRun(UUID uuid, Skill skill) {
+    public ExcavationRun(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -30,21 +30,12 @@ public class ExcavationRun extends Ability implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != playerUUID) {
-            return;
-        }
-        if (!isHappening) {
-            return;
-        }
-        if (player.isSneaking()) {
+        if (player.getUniqueId() != playerUUID || !isHappening || player.isSneaking()) {
             return;
         }
         Location from = event.getFrom();
         Location to = event.getTo();
-        if (to == null) {
-            return;
-        }
-        if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ()) {
+        if (to == null || (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())) {
             return;
         }
         Block blockBelow = from.subtract(0, 1, 0).getBlock();  // Block that player was standing on

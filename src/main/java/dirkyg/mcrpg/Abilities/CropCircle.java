@@ -17,9 +17,9 @@ public class CropCircle extends Ability implements Listener {
 
     public int radius = 0;
 
-    public CropCircle(UUID uuid, Skill skill) {
+    public CropCircle(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -32,13 +32,7 @@ public class CropCircle extends Ability implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != playerUUID) {
-            return;
-        }
-        if (!isHappening) {
-            return;
-        }
-        if (player.isSneaking()) {
+        if (player.getUniqueId() != playerUUID || !isHappening || player.isSneaking()) {
             return;
         }
         Block block = event.getBlockPlaced();

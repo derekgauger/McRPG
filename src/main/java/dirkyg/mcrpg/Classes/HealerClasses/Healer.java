@@ -1,5 +1,6 @@
-package dirkyg.mcrpg.Classes;
+package dirkyg.mcrpg.Classes.HealerClasses;
 
+import dirkyg.mcrpg.Classes.RPGClass;
 import dirkyg.mcrpg.McRPG;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -10,13 +11,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
-public class Monk extends RPGClass implements Listener {
+public class Healer extends RPGClass implements Listener {
 
     UUID uuid;
     private final int HEAL_AMOUNT = 1;  //half a heart
     private final int HEAL_INTERVAL = 20 * 2; // 3 seconds
 
-    public Monk (UUID uuid) {
+    public Healer (UUID uuid) {
         this.uuid = uuid;
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -33,12 +34,17 @@ public class Monk extends RPGClass implements Listener {
     }
 
     @Override
-    void deactivatePlayer() {
+    public void deactivatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             player.setMaxHealth(20.0);
         }
         setCurrentlyActive(false);
+    }
+
+    @Override
+    public void setSubClass(Class subClassType) {
+
     }
 
     @EventHandler

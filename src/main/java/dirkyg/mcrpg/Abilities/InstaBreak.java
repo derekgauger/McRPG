@@ -19,9 +19,9 @@ import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
 public class InstaBreak extends Ability implements Listener {
-    public InstaBreak(UUID uuid, Skill skill) {
+    public InstaBreak(UUID uuid, String classifier) {
         super.playerUUID = uuid;
-        super.skill = skill;
+        super.classifier = classifier;
         super.abilityName = this.toString();
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -29,23 +29,17 @@ public class InstaBreak extends Ability implements Listener {
     @EventHandler
     public void onBlockDamage(BlockDamageEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != playerUUID) {
-            return;
-        }
-        if (!isHappening) {
-            return;
-        }
-        if (player.isSneaking()) {
+        if (player.getUniqueId() != playerUUID || player.isSneaking() || !isHappening) {
             return;
         }
         ItemStack itemUsed = player.getInventory().getItemInMainHand();
         Block block = event.getBlock();
         boolean doBreak = false;
-        if (skill instanceof MiningSkill) {
+        if (classifier.equalsIgnoreCase("Mining")) {
             doBreak = Utils.isMineMat(block.getType()) && Utils.isPickaxe(itemUsed.getType());
-        } else if (skill instanceof LoggingSkill) {
+        } else if (classifier.equalsIgnoreCase("Logging")) {
             doBreak = Utils.isWood(block.getType()) && Utils.isAxe(itemUsed.getType());
-        } else if (skill instanceof DiggingSkill) {
+        } else if (classifier.equalsIgnoreCase("Digging")) {
             doBreak = Utils.isDigMat(block.getType()) && Utils.isShovel(itemUsed.getType());
         }
         if (doBreak && player.getGameMode() != GameMode.CREATIVE) {

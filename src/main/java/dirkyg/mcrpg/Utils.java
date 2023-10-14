@@ -4,15 +4,18 @@ import dirkyg.mcrpg.Skills.SkillManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -227,11 +230,20 @@ public class Utils implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        System.out.println(event.getCause());
         if (event.getEntity() instanceof Player player) {
             if (event.getEntity().getNearbyEntities(2, 2, 2).stream().anyMatch(e -> e.getType().toString().equals("FIREWORK"))) {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Block block = event.getBlockPlaced();
+        block.setMetadata("playerPlaced", new FixedMetadataValue(McRPG.plugin, true));
+    }
+
+    public static boolean isPlaced(Block block) {
+        return block.hasMetadata("playerPlaced");
     }
 }

@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -19,15 +20,11 @@ import java.util.UUID;
 
 public class DiggingSkill extends Skill implements Listener {
 
-    Ability activeAbility;
-    InstaBreak instaBreak;
-    ExcavationRun excavationRun;
+    Ability instaBreak;
 
     public DiggingSkill(UUID uuid) {
         super.uuid = uuid;
-        instaBreak = new InstaBreak(uuid, this);
-        excavationRun = new ExcavationRun(uuid, this);
-        activeAbility = instaBreak;
+        instaBreak = new InstaBreak(uuid, this.toString());
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -53,35 +50,13 @@ public class DiggingSkill extends Skill implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
-        if (!player.isSneaking()) {
-            return;
-        }
-        if (activeAbility.isHappening()) {
-            return;
-        }
         ItemStack currentItem = player.getInventory().getItemInMainHand();
         Material currentItemType = currentItem.getType();
-        if (!Utils.isShovel(currentItemType)) {
+        if (player.getUniqueId() != uuid || !player.isSneaking() || instaBreak.isHappening() || !Utils.isShovel(currentItemType)) {
             return;
         }
-        switch (event.getAction()) {
-            case RIGHT_CLICK_BLOCK -> {
-                activeAbility.processAbility(event, player, "Right Click");
-            }
-            case RIGHT_CLICK_AIR -> {
-                if (instaBreak.isHappening() || excavationRun.isHappening()) {
-                    return;
-                }
-                if (activeAbility instanceof InstaBreak) {
-                    activeAbility = excavationRun;
-                } else if (activeAbility instanceof ExcavationRun) {
-                    activeAbility = instaBreak;
-                }
-                Utils.sendActionBar(player, Utils.chat("&dYour pickaxe ability is now in " + activeAbility.toString() + " mode!"));
-            }
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            instaBreak.processAbility(event, player, "Right Click");
         }
     }
 
@@ -100,14 +75,11 @@ public class DiggingSkill extends Skill implements Listener {
             case 45:
             case 50:
                 int instaBreakTimeUpgrade = 3;
-                int excTimeUpgrade = 3;
                 instaBreak.duration += instaBreakTimeUpgrade;
-                excavationRun.duration += excTimeUpgrade;
                 if (player == null) {
                     return;
                 }
                 player.sendMessage(Utils.chat("&6Ability Upgraded | " + instaBreak + " | Duration (" + (instaBreak.duration - instaBreakTimeUpgrade) + " -> " + instaBreak.duration + ") seconds"));
-                player.sendMessage(Utils.chat("&6Ability Upgraded | " + excavationRun + " | Duration (" + (excavationRun.duration - excTimeUpgrade) + " -> " + excavationRun.duration + ") seconds"));
         }
     }
 }

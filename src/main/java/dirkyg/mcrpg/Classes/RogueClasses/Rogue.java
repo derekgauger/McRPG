@@ -1,5 +1,8 @@
-package dirkyg.mcrpg.Classes;
+package dirkyg.mcrpg.Classes.RogueClasses;
 
+import dirkyg.mcrpg.Classes.RPGClass;
+import dirkyg.mcrpg.Classes.WarriorClasses.Berserker;
+import dirkyg.mcrpg.Classes.WarriorClasses.Elemental;
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Utils;
 import net.minecraft.server.level.EntityPlayer;
@@ -14,6 +17,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.UUID;
@@ -21,16 +26,22 @@ import java.util.UUID;
 public class Rogue extends RPGClass implements Listener {
 
     UUID uuid;
-    double damageMultiplier = .75;
+    float damageMultiplier = .75f;
     boolean doubleJumpUsed = false;
     long noFallDamageCooldown = 0L;
     float knockBackMultiplier = 1.5f;
     float baseSpeed = .35f;
-    float fastWalkSpeed = .45f;
+    float heavyWeaponSpeed = .15f;
+    float climbSpeed = .3f;
 
+    RPGClass activeClass;
+    Assassin assassin;
+    Trickster trickster;
 
     public Rogue(UUID uuid) {
         this.uuid = uuid;
+        assassin = new Assassin(uuid);
+        trickster = new Trickster(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -39,10 +50,12 @@ public class Rogue extends RPGClass implements Listener {
         Player player = Bukkit.getPlayer(uuid);
         player.setWalkSpeed(baseSpeed);
         setCurrentlyActive(true);
+        player.setMaxHealth(14);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, PotionEffect.INFINITE_DURATION, 1));
     }
 
     @Override
-    void deactivatePlayer() {
+    public void deactivatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             player.setWalkSpeed(.2f);
@@ -50,6 +63,22 @@ public class Rogue extends RPGClass implements Listener {
         }
         setCurrentlyActive(false);
         player.setInvisible(false);
+        player.removePotionEffect(PotionEffectType.WATER_BREATHING);
+    }
+
+    @Override
+    public void setSubClass(Class subClassType) {
+        if (activeClass != null) {
+            activeClass.deactivatePlayer();
+        }
+        if (subClassType.equals(Assassin.class)) {
+            activeClass = assassin;
+        } else if (subClassType.equals(Trickster.class)) {
+            activeClass = trickster;
+        } else {
+            return;
+        }
+        activeClass.activatePlayer();
     }
 
     public void reduceDamage(EntityDamageByEntityEvent event) {
@@ -90,9 +119,6 @@ public class Rogue extends RPGClass implements Listener {
 
     public void processDoubleJump(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
         if (player.getGameMode() != GameMode.SURVIVAL || player.isFlying()) {
             return;
         }
@@ -106,24 +132,8 @@ public class Rogue extends RPGClass implements Listener {
         }
     }
 
-    public void processNothingInHand(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
-        ItemStack currentItem = player.getInventory().getItemInMainHand();
-        if (currentItem.getType() == Material.AIR) {
-            player.setWalkSpeed(fastWalkSpeed);
-        } else {
-            player.setWalkSpeed(baseSpeed);
-        }
-    }
-
     public void processInvisible(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
-            return;
-        }
         ItemStack currentItem = player.getInventory().getItemInMainHand();
         if (currentItem.getType() == Material.AIR) {
             player.setInvisible(true);
@@ -132,23 +142,49 @@ public class Rogue extends RPGClass implements Listener {
         }
     }
 
+    public void processClimb(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (player.isSneaking()) {
+            Material blockInFront = player.getEyeLocation().add(player.getLocation().getDirection()).getBlock().getType();
+            Material blockAboveFront = player.getEyeLocation().add(player.getLocation().getDirection()).add(0, 1, 0).getBlock().getType();
+            Material blockTwoAboveFront = player.getEyeLocation().add(player.getLocation().getDirection()).add(0, 2, 0).getBlock().getType();
+            if (blockInFront.isSolid() || blockAboveFront.isSolid()) {
+                Vector velocity = player.getVelocity();
+                velocity.setY(climbSpeed);
+                if (!blockTwoAboveFront.isSolid() && blockAboveFront.isSolid()) {
+                    velocity.add(player.getLocation().getDirection().multiply(0.2));
+                }
+                player.setVelocity(velocity);
+            }
+        }
+    }
+
+    public void processHeavyWeaponsOut(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        ItemStack currentItem = player.getInventory().getItemInMainHand();
+        if (Utils.isSword(currentItem.getType()) || Utils.isAxe(currentItem.getType())) {
+            player.setWalkSpeed(heavyWeaponSpeed);
+        } else {
+            player.setWalkSpeed(baseSpeed);
+        }
+    }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (!isCurrentlyActive()) {
+        Player player = event.getPlayer();
+        if (!isCurrentlyActive() || player.getUniqueId() != uuid) {
             return;
         }
         processDoubleJump(event);
-        processNothingInHand(event);
         processInvisible(event);
+        processClimb(event);
+        processHeavyWeaponsOut(event);
     }
 
     @EventHandler
     public void onToggleFlight(PlayerToggleFlightEvent event) {
-        if (!isCurrentlyActive()) {
-            return;
-        }
         Player player = event.getPlayer();
-        if (player.getUniqueId() != uuid) {
+        if (!isCurrentlyActive() || player.getUniqueId() != uuid) {
             return;
         }
         if (player.getGameMode() == GameMode.SURVIVAL) {
@@ -169,8 +205,7 @@ public class Rogue extends RPGClass implements Listener {
         if (!isCurrentlyActive()) {
             return;
         }
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
+        if (event.getEntity() instanceof Player player) {
             if (player.getUniqueId() != uuid) {
                 return;
             }
