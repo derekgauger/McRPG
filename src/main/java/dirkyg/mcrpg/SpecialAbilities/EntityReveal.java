@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.Skills.Skill;
 import org.bukkit.Bukkit;
@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-public class EntityReveal extends Ability{
+public class EntityReveal extends SpecialAbility{
 
     HashSet<UUID> glowingEntities;
 

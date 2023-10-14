@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
 import org.bukkit.Bukkit;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import static dirkyg.mcrpg.Utilities.BooleanChecks.*;
 
-public class InstaBreak extends Ability implements Listener {
+public class InstaBreak extends SpecialAbility implements Listener {
     public InstaBreak(UUID uuid, String classifier) {
         super.playerUUID = uuid;
         super.classifier = classifier;

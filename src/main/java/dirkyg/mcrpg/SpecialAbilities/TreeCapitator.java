@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
 import org.bukkit.Bukkit;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import static dirkyg.mcrpg.Utilities.BooleanChecks.*;
 import static dirkyg.mcrpg.Utilities.Visuals.colorText;
 
-public class TreeCapitator extends Ability implements Listener {
+public class TreeCapitator extends SpecialAbility implements Listener {
 
     private final int MAX_NUM_TREE_CAP_BLOCKS = 100;
     private boolean continueTreeCapping;

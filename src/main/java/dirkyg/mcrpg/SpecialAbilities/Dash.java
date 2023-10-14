@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
 import org.bukkit.Bukkit;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import static dirkyg.mcrpg.Utilities.BooleanChecks.isSword;
 
-public class Dash extends Ability implements Listener {
+public class Dash extends SpecialAbility implements Listener {
 
     private long dashCoolDown = 2;
     private long nextAvailableUsage;

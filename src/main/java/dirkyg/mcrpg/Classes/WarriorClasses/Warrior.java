@@ -16,36 +16,34 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Abilities.Ability;
-import dirkyg.mcrpg.Abilities.Dash;
 import dirkyg.mcrpg.Classes.RPGClass;
+import dirkyg.mcrpg.PassiveAbilities.NearDeathExperience;
+import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
+import dirkyg.mcrpg.SpecialAbilities.Dash;
 
 public class Warrior extends RPGClass implements Listener {
 
     UUID uuid;
     private final float damageMultiplier = 2.0f;
     private final float baseSpeed = .13f;
-    private final long immunityDuration = 10000; // seconds
-    private final long immunityCooldown = 5 * 60 * 1000;
-    private long immuneUntil = 0;
-    private long immunityCooldownResetTime = 0;
+
     private float projectileReductionMultiplier = .5f;
 
     RPGClass activeClass;
     Berserker berserker;
     Elemental elemental;
 
-    Ability dash;
+    SpecialAbility dash;
+    NearDeathExperience nearDeathExperience;
 
     public Warrior(UUID uuid) {
         this.uuid = uuid;
         berserker = new Berserker(uuid);
         elemental = new Elemental(uuid);
         dash = new Dash(uuid, this.toString());
+        nearDeathExperience = new NearDeathExperience(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -60,8 +58,9 @@ public class Warrior extends RPGClass implements Listener {
         if (player != null) {
             player.setWalkSpeed(baseSpeed);
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(32.0);
+            nearDeathExperience.start();
+            setCurrentlyActive(true);
         }
-        setCurrentlyActive(true);
     }
 
     @Override
@@ -70,8 +69,9 @@ public class Warrior extends RPGClass implements Listener {
         if (player != null) {
             player.setWalkSpeed(.2f);
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0);
+            nearDeathExperience.stop();
+            setCurrentlyActive(false);
         }
-        setCurrentlyActive(false);
     }
 
     @Override
@@ -104,9 +104,14 @@ public class Warrior extends RPGClass implements Listener {
         }
     }
 
-    public void processPlayerDamageMultiplier(EntityDamageByEntityEvent event) {
+    public void processDamageChanges(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
         Entity damager = event.getDamager();
+        if (damager instanceof Arrow arrow) {
+            double originalDamage = event.getDamage();
+            double modifiedDamage = originalDamage * projectileReductionMultiplier;
+            event.setDamage(modifiedDamage);
+        }
         if (damager instanceof Trident trident) {
             damager = (Entity) trident.getShooter();
         }
@@ -117,47 +122,12 @@ public class Warrior extends RPGClass implements Listener {
         }
     }
 
-    public void processPlayerProjectileDamageReduction(EntityDamageByEntityEvent event) {
-        Player player = Bukkit.getPlayer(uuid);
-        Entity damager = event.getDamager();
-        if (damager instanceof Arrow arrow) {
-            damager = (Entity) arrow.getShooter();
-        }
-        if (damager == player) {
-            double originalDamage = event.getDamage();
-            double modifiedDamage = originalDamage * projectileReductionMultiplier;
-            event.setDamage(modifiedDamage);
-        }
-    }
-
-    public void processPlayerHealthTooLow(EntityDamageByEntityEvent event) {
-        Player player = Bukkit.getPlayer(uuid);
-        Entity damaged = event.getEntity();
-        Entity damager = event.getDamager();
-        if (!(damager instanceof Player) && player == damaged) {
-            double newHealth = player.getHealth() - event.getFinalDamage();
-            long currentTime = System.currentTimeMillis();
-            if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-                return;
-            }
-            if (newHealth <= 0 && currentTime >= immunityCooldownResetTime) {
-                event.setCancelled(true);
-                player.setHealth(1);
-                immuneUntil = System.currentTimeMillis() + immunityDuration;
-                immunityCooldownResetTime = immuneUntil + immunityCooldown;
-                PotionEffect immunityEffect = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4);
-                player.addPotionEffect(immunityEffect, true);
-            }
-        }
-    }
 
     @EventHandler
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
         if (!isCurrentlyActive()) {
             return;
         }
-        processPlayerDamageMultiplier(event);
-        processPlayerHealthTooLow(event);
-        processPlayerProjectileDamageReduction(event);
+        processDamageChanges(event);
     }
 }

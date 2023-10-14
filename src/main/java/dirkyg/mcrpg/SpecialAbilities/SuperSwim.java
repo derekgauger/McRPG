@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.Skills.Skill;
 import org.bukkit.Bukkit;
@@ -8,7 +8,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.UUID;
 
-public class SuperSwim extends Ability {
+public class SuperSwim extends SpecialAbility {
 
     public SuperSwim(UUID uuid, String classifier) {
         super.playerUUID = uuid;

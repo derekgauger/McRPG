@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Skills.Skill;
@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
-public class HomingArrows extends Ability implements Listener {
+public class HomingArrows extends SpecialAbility implements Listener {
 
     public float arrowSpeed = 3.5f;
 

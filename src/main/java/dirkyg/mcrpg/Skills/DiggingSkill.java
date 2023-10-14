@@ -18,12 +18,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Abilities.Ability;
-import dirkyg.mcrpg.Abilities.InstaBreak;
+import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
+import dirkyg.mcrpg.SpecialAbilities.InstaBreak;
 
 public class DiggingSkill extends Skill implements Listener {
 
-    Ability instaBreak;
+    SpecialAbility instaBreak;
 
     public DiggingSkill(UUID uuid) {
         super.uuid = uuid;

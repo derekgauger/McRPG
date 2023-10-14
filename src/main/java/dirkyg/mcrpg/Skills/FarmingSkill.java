@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Abilities.CropCircle;
+import dirkyg.mcrpg.SpecialAbilities.CropCircle;
 
 public class FarmingSkill extends Skill implements Listener {
 

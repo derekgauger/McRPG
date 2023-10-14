@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Skills.Skill;
@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.UUID;
 
-public class ExcavationRun extends Ability implements Listener {
+public class ExcavationRun extends SpecialAbility implements Listener {
 
     public ExcavationRun(UUID uuid, String classifier) {
         super.playerUUID = uuid;

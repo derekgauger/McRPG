@@ -31,7 +31,6 @@ public class Wizard extends RPGClass implements Listener {
 
     UUID uuid;
     private ItemStack wand;
-    private boolean wandGiven = false;
     private int backfirePercentage = 15;
     private int maxSpellDistance = 120;
     private long spellCoolDownTime = 10000; // 10 seconds
@@ -52,18 +51,19 @@ public class Wizard extends RPGClass implements Listener {
     @Override
     public void activatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
-        if (player != null && !wandGiven) {
+        if (player != null) {
             wand = createGUIItem(Material.STICK, ("&b" + player.getName() + "'s Wand"), 1);
             addItemToInventory(wand, player);
-            wandGiven = true;
+            setCurrentlyActive(true);
         }
-        setCurrentlyActive(true);
     }
 
     @Override
     public void deactivatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
-        setCurrentlyActive(false);
+        if (player != null) {
+            setCurrentlyActive(false);
+        }
     }
 
     @Override

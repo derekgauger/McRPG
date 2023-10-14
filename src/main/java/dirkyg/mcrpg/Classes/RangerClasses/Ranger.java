@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Classes.RPGClass;
+import dirkyg.mcrpg.PassiveAbilities.Climb;
 
 public class Ranger extends RPGClass implements Listener {
 
@@ -31,7 +32,6 @@ public class Ranger extends RPGClass implements Listener {
     float baseSpeed = .275f;
     float archerBiomeSpeed = .325f;
     float heavyWeaponSpeed = .15f;
-    float climbSpeed = .3f;
     Biome[] archerBiomes = new Biome[] {Biome.FOREST, Biome.FLOWER_FOREST, Biome.BIRCH_FOREST, Biome.DARK_FOREST, Biome.OLD_GROWTH_BIRCH_FOREST,
                                         Biome.TAIGA, Biome.OLD_GROWTH_PINE_TAIGA, Biome.OLD_GROWTH_SPRUCE_TAIGA, Biome.SNOWY_TAIGA, Biome.JUNGLE,
                                         Biome.BAMBOO_JUNGLE, Biome.SPARSE_JUNGLE};
@@ -40,10 +40,13 @@ public class Ranger extends RPGClass implements Listener {
     Hunter hunter;
     Sniper sniper;
 
+    Climb climb;
+
     public Ranger(UUID uuid) {
         this.uuid = uuid;
         hunter = new Hunter(uuid);
         sniper = new Sniper(uuid);
+        climb = new Climb(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -53,8 +56,9 @@ public class Ranger extends RPGClass implements Listener {
         if (player != null) {
             player.setWalkSpeed(baseSpeed);
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(14);
+            climb.start();
+            setCurrentlyActive(true);
         }
-        setCurrentlyActive(true);
     }
 
     @Override
@@ -63,8 +67,9 @@ public class Ranger extends RPGClass implements Listener {
         if (player != null) {
             player.setWalkSpeed(.2f);
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0);
+            climb.stop();
+            setCurrentlyActive(false);
         }
-        setCurrentlyActive(false);
     }
 
     @Override
@@ -82,21 +87,13 @@ public class Ranger extends RPGClass implements Listener {
         activeClass.activatePlayer();
     }
 
-    public void processClimb(PlayerMoveEvent event) {
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.isSneaking()) {
-            Material blockInFront = player.getEyeLocation().add(player.getLocation().getDirection()).getBlock().getType();
-            Material blockAboveFront = player.getEyeLocation().add(player.getLocation().getDirection()).add(0, 1, 0).getBlock().getType();
-            Material blockTwoAboveFront = player.getEyeLocation().add(player.getLocation().getDirection()).add(0, 2, 0).getBlock().getType();
-            if (blockInFront.isSolid() || blockAboveFront.isSolid()) {
-                Vector velocity = player.getVelocity();
-                velocity.setY(climbSpeed);
-                if (!blockTwoAboveFront.isSolid() && blockAboveFront.isSolid()) {
-                    velocity.add(player.getLocation().getDirection().multiply(0.2));
-                }
-                player.setVelocity(velocity);
-            }
+        if (!isCurrentlyActive() || player.getUniqueId() != uuid) {
+            return;
         }
+        processSpeedChanges(event);
     }
 
     public void processSpeedChanges(PlayerMoveEvent event) {
@@ -115,16 +112,14 @@ public class Ranger extends RPGClass implements Listener {
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        if (!isCurrentlyActive() || player.getUniqueId() != uuid) {
+    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        if (!isCurrentlyActive()) {
             return;
         }
-        processClimb(event);
-        processSpeedChanges(event);
+        processDamageChanges(event);
     }
 
-    public void processMoreProjectileDamage(EntityDamageByEntityEvent event) {
+    public void processDamageChanges(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
         Entity damager = event.getDamager();
         boolean isProjectile = false;
@@ -145,13 +140,5 @@ public class Ranger extends RPGClass implements Listener {
             double modifiedDamage = originalDamage * meleeDamageMultiplier;
             event.setDamage(modifiedDamage);
         }
-    }
-
-    @EventHandler
-    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-        if (!isCurrentlyActive()) {
-            return;
-        }
-        processMoreProjectileDamage(event);
     }
 }

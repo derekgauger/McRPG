@@ -19,23 +19,25 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Classes.RPGClass;
+import dirkyg.mcrpg.PassiveAbilities.AutoHeal;
 
 public class Healer extends RPGClass implements Listener {
 
     UUID uuid;
     float baseSpeed = .3f;
     float heavyWeaponSpeed = .15f;
-    private final int HEAL_AMOUNT = 1;  //half a heart
-    private final int HEAL_INTERVAL = 20 * 2; // 3 seconds
 
     RPGClass activeClass;
     Cleric cleric;
     Necromancer necromancer;
 
+    AutoHeal autoHeal;
+
     public Healer (UUID uuid) {
         this.uuid = uuid;
         cleric = new Cleric(uuid);
         necromancer = new Necromancer(uuid);
+        autoHeal = new AutoHeal(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
@@ -45,10 +47,11 @@ public class Healer extends RPGClass implements Listener {
         if (player != null) {
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(10.0);
             player.setWalkSpeed(baseSpeed);
-            autoHeal(player);
+            autoHeal.start();
+            autoHeal.startAutoHealing(player);
             player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 2));
+            setCurrentlyActive(true);
         }
-        setCurrentlyActive(true);
     }
 
     @Override
@@ -58,8 +61,9 @@ public class Healer extends RPGClass implements Listener {
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0);
             player.setWalkSpeed(.2f);
             player.removePotionEffect(PotionEffectType.DOLPHINS_GRACE);
+            autoHeal.stop();
+            setCurrentlyActive(false);
         }
-        setCurrentlyActive(false);
     }
 
     @Override
@@ -113,20 +117,5 @@ public class Healer extends RPGClass implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 1));
         }
         processHeavyWeaponsOut(event);
-    }
-
-    private void autoHeal(Player player) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!isCurrentlyActive()) {
-                    this.cancel();
-                    return;
-                }
-                if (player.getHealth() < player.getMaxHealth()) {
-                    player.setHealth(Math.min(player.getMaxHealth(), player.getHealth() + HEAL_AMOUNT));
-                }
-            }
-        }.runTaskTimer(McRPG.plugin, 0, HEAL_INTERVAL);
     }
 }

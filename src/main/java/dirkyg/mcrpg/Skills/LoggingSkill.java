@@ -18,12 +18,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Abilities.Ability;
-import dirkyg.mcrpg.Abilities.TreeCapitator;
+import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
+import dirkyg.mcrpg.SpecialAbilities.TreeCapitator;
 
 public class LoggingSkill extends Skill implements Listener {
 
-    Ability treeCapitator;
+    SpecialAbility treeCapitator;
 
     public LoggingSkill(UUID uuid) {
         super.uuid = uuid;

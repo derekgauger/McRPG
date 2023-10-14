@@ -1,4 +1,4 @@
-package dirkyg.mcrpg.Abilities;
+package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
 import org.bukkit.entity.Player;
@@ -7,10 +7,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
-import static dirkyg.mcrpg.Utilities.Visuals.colorText;
 import static dirkyg.mcrpg.Utilities.Visuals.sendActionBar;
 
-public abstract class Ability {
+public abstract class SpecialAbility {
 
     UUID playerUUID;
     final long PROMPT_STAY_UP_TIME = 3000;
