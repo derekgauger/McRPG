@@ -67,20 +67,9 @@ public class Healer extends RPGClass implements Listener {
     }
 
     @Override
-    public void setSubClass(Class subClassType) {
-        if (activeClass != null) {
-            activeClass.deactivatePlayer();
-        }
-        if (subClassType.equals(Cleric.class)) {
-            activeClass = cleric;
-        } else if (subClassType.equals(Necromancer.class)) {
-            activeClass = necromancer;
-        } else {
-            return;
-        }
-        activeClass.activatePlayer();
+    public String toString() {
+        return "Healer";
     }
-
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
@@ -117,5 +106,11 @@ public class Healer extends RPGClass implements Listener {
             player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 1));
         }
         processHeavyWeaponsOut(event);
+    }
+
+    @Override
+    public void processClassUpgrade() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processClassUpgrade'");
     }
 }

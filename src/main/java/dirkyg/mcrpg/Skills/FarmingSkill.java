@@ -57,7 +57,7 @@ public class FarmingSkill extends Skill implements Listener {
         BlockData blockData = brokenBlock.getBlockData();
         if (isCrop(brokenBlock.getType()) && (blockData instanceof Ageable ageableCrop)) {
             if (ageableCrop.getAge() == ageableCrop.getMaximumAge()) {
-                SkillManager.processSkillIncrement(player, this, 2);
+                SkillManager.processSkillIncrement(player, this, SkillManager.farmingXpMultipler);
             }
         }
     }

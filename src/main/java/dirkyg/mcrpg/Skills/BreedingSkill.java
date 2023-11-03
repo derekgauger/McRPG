@@ -51,7 +51,7 @@ public class BreedingSkill extends Skill implements Listener {
         if (randomNumber <= spawnPercentage) {
             SkillManager.animalBeaconManager.createNewAnimalBeacon(event.getEntity(), initializePotions());
         }
-        SkillManager.processSkillIncrement(player, this, 3);
+        SkillManager.processSkillIncrement(player, this, SkillManager.breedingXpMultipler);
     }
 
     private void upgradeSpecialBreedPercent(Player player) {

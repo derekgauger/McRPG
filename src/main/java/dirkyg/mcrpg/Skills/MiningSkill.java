@@ -1,6 +1,6 @@
 package dirkyg.mcrpg.Skills;
 
-import static dirkyg.mcrpg.Utilities.BooleanChecks.isMineMat;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isPlaced;
 import static dirkyg.mcrpg.Utilities.BooleanChecks.isPickaxe;
 import static dirkyg.mcrpg.Utilities.Visuals.colorText;
 
@@ -19,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
+import dirkyg.mcrpg.Utilities.BlockPoints.DiggingBlockPoints;
+import dirkyg.mcrpg.Utilities.BlockPoints.MiningBlockPoints;
 import dirkyg.mcrpg.SpecialAbilities.InstaBreak;
 
 public class MiningSkill extends Skill implements Listener {
@@ -58,8 +60,16 @@ public class MiningSkill extends Skill implements Listener {
         ItemStack usedItem = player.getInventory().getItemInMainHand();
         Material usedItemType = usedItem.getType();
         Block brokenBlock = event.getBlock();
-        if (isMineMat(brokenBlock.getType()) && isPickaxe(usedItemType)) {
-            SkillManager.processSkillIncrement(player, this, 1);
+        String blockTypeName = brokenBlock.getType().toString();
+        if (isPlaced(brokenBlock)) {
+            return;
+        }
+        if (MiningBlockPoints.contains(blockTypeName) && isPickaxe(usedItemType)) {
+            double incrementAmount = MiningBlockPoints.getEnumpoints(blockTypeName);
+            SkillManager.processSkillIncrement(player, this, incrementAmount * SkillManager.miningXpMultipler);
+            if (incrementAmount >= 5) {
+                McRPG.LOGGER.info(player.getName() + " mined " + blockTypeName);
+            }
         }
     }
 

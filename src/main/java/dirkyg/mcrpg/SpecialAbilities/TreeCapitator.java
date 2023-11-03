@@ -1,6 +1,8 @@
 package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Utilities.BlockPoints.LoggingBlockPoints;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -44,7 +46,7 @@ public class TreeCapitator extends SpecialAbility implements Listener {
         ItemStack usedItem = player.getInventory().getItemInMainHand();
         Material usedItemType = usedItem.getType();
         Block brokenBlock = event.getBlock();
-        if (isWood(brokenBlock.getType()) && isAxe(usedItemType)) {
+        if (LoggingBlockPoints.contains(brokenBlock.getType().toString()) && isAxe(usedItemType)) {
             continueTreeCapping = true;
             breakConnectedLogs(brokenBlock, new HashSet<>(), player);
         }
@@ -55,10 +57,12 @@ public class TreeCapitator extends SpecialAbility implements Listener {
             return;
         }
         if (checkedBlocks.size() >= MAX_NUM_TREE_CAP_BLOCKS) {
-            player.sendMessage(colorText("&cYou reached the max number of blocks that can be broken with tree-capitator (" + MAX_NUM_TREE_CAP_BLOCKS + ")!"));
+            player.sendMessage(
+                    colorText("&cYou reached the max number of blocks that can be broken with tree-capitator ("
+                            + MAX_NUM_TREE_CAP_BLOCKS + ")!"));
             continueTreeCapping = false;
         }
-        if (isLog(block.getType())) {
+        if (LoggingBlockPoints.contains(block.getType().toString())) {
             checkedBlocks.add(block);
             block.breakNaturally(player.getInventory().getItemInMainHand());
             ItemStack itemInHand = player.getInventory().getItemInMainHand();
@@ -95,12 +99,17 @@ public class TreeCapitator extends SpecialAbility implements Listener {
     }
 
     @Override
-    void resetAfterAbilityFinished() {
+    void resetAfterAbilityFinished(Player player) {
 
     }
 
     @Override
-    void processActionDuringAbility() {
+    void processActionDuringAbility(int iterations, Player player) {
 
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 }

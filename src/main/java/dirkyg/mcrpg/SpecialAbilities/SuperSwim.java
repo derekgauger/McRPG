@@ -22,18 +22,21 @@ public class SuperSwim extends SpecialAbility {
     }
 
     @Override
-    void resetAfterAbilityFinished() {
-        Player player = Bukkit.getPlayer(playerUUID);
+    void resetAfterAbilityFinished(Player player) {
         if (player != null) {
             player.removePotionEffect(PotionEffectType.DOLPHINS_GRACE);
         }
     }
 
     @Override
-    void processActionDuringAbility() {
-        Player player = Bukkit.getPlayer(playerUUID);
+    void processActionDuringAbility(int iterations, Player player) {
         if (player != null) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 20 * 2, 1));
         }
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 }

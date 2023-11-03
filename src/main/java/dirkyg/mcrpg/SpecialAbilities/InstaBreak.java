@@ -1,8 +1,13 @@
 package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Utilities.BlockPoints.DiggingBlockPoints;
+import dirkyg.mcrpg.Utilities.BlockPoints.LoggingBlockPoints;
+import dirkyg.mcrpg.Utilities.BlockPoints.MiningBlockPoints;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -31,13 +36,15 @@ public class InstaBreak extends SpecialAbility implements Listener {
         }
         ItemStack itemUsed = player.getInventory().getItemInMainHand();
         Block block = event.getBlock();
+        Material type = block.getType();
+        String materialName = type.toString();
         boolean doBreak = false;
         if (classifier.equalsIgnoreCase("Mining")) {
-            doBreak = isMineMat(block.getType()) && isPickaxe(itemUsed.getType());
+            doBreak = MiningBlockPoints.contains(materialName) && isPickaxe(itemUsed.getType());
         } else if (classifier.equalsIgnoreCase("Logging")) {
-            doBreak = isWood(block.getType()) && isAxe(itemUsed.getType());
+            doBreak = LoggingBlockPoints.contains(materialName) && isAxe(itemUsed.getType());
         } else if (classifier.equalsIgnoreCase("Digging")) {
-            doBreak = isDigMat(block.getType()) && isShovel(itemUsed.getType());
+            doBreak = DiggingBlockPoints.contains(materialName) && isShovel(itemUsed.getType());
         }
         if (doBreak && player.getGameMode() != GameMode.CREATIVE) {
             event.setCancelled(true);
@@ -46,19 +53,23 @@ public class InstaBreak extends SpecialAbility implements Listener {
         }
     }
 
-
     @Override
     public String toString() {
         return "Insta-break";
     }
 
     @Override
-    void resetAfterAbilityFinished() {
+    void resetAfterAbilityFinished(Player player) {
 
     }
 
     @Override
-    void processActionDuringAbility() {
+    void processActionDuringAbility(int iterations, Player player) {
 
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 }

@@ -35,7 +35,7 @@ public class DoubleJump extends PassiveAbility implements Listener {
 
     public void processDoubleJump(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getGameMode() != GameMode.SURVIVAL || player.isFlying()) {
+        if (player.getGameMode() == GameMode.CREATIVE || player.isFlying()) {
             return;
         }
         if (player.isOnGround()) {

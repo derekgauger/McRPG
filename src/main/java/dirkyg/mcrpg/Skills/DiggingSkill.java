@@ -1,7 +1,7 @@
 package dirkyg.mcrpg.Skills;
 
-import static dirkyg.mcrpg.Utilities.BooleanChecks.isDigMat;
 import static dirkyg.mcrpg.Utilities.BooleanChecks.isShovel;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isPlaced;
 import static dirkyg.mcrpg.Utilities.Visuals.colorText;
 
 import java.util.UUID;
@@ -19,9 +19,12 @@ import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
+import dirkyg.mcrpg.Utilities.BlockPoints.DiggingBlockPoints;
 import dirkyg.mcrpg.SpecialAbilities.InstaBreak;
 
 public class DiggingSkill extends Skill implements Listener {
+
+    final double xpMultipler = 3;
 
     SpecialAbility instaBreak;
 
@@ -45,8 +48,13 @@ public class DiggingSkill extends Skill implements Listener {
         ItemStack usedItem = player.getInventory().getItemInMainHand();
         Material usedItemType = usedItem.getType();
         Block brokenBlock = event.getBlock();
-        if (isDigMat(brokenBlock.getType()) && isShovel(usedItemType)) {
-            SkillManager.processSkillIncrement(player, this, 1);
+        String blockTypeName = brokenBlock.getType().toString();
+        if (isPlaced(brokenBlock)) {
+            return;
+        }
+        if (DiggingBlockPoints.contains(blockTypeName) && isShovel(usedItemType)) {
+            double incrementAmount = DiggingBlockPoints.getEnumpoints(blockTypeName);
+            SkillManager.processSkillIncrement(player, this, incrementAmount * SkillManager.diggingXpMultipler);
         }
     }
 

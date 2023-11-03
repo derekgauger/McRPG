@@ -1,7 +1,6 @@
 package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Skills.Skill;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,19 +37,24 @@ public class ExcavationRun extends SpecialAbility implements Listener {
         if (to == null || (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())) {
             return;
         }
-        Block blockBelow = from.subtract(0, 1, 0).getBlock();  // Block that player was standing on
+        Block blockBelow = from.subtract(0, 1, 0).getBlock(); // Block that player was standing on
         if (blockBelow.getType() != Material.AIR) {
             blockBelow.breakNaturally(player.getInventory().getItemInMainHand());
         }
     }
 
     @Override
-    void resetAfterAbilityFinished() {
+    void resetAfterAbilityFinished(Player player) {
 
     }
 
     @Override
-    void processActionDuringAbility() {
+    void processActionDuringAbility(int iterations, Player player) {
 
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 }

@@ -81,7 +81,7 @@ public class FishingSkill extends Skill implements Listener {
                     String msg = itemMsgs.get(item);
                     sendActionBar(player, msg);
                 }
-                SkillManager.processSkillIncrement(player, this, 7);
+                SkillManager.processSkillIncrement(player, this, SkillManager.fishingXpMultipler);
             }
         }
     }

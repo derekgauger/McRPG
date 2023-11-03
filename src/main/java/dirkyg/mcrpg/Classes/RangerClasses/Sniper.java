@@ -26,7 +26,13 @@ public class Sniper extends RPGClass implements Listener {
     }
 
     @Override
-    public void setSubClass(Class subClassType) {
+    public String toString() {
+        return "Sniper";
+    }
 
+    @Override
+    public void processClassUpgrade() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processClassUpgrade'");
     }
 }

@@ -26,7 +26,13 @@ public class IceWizard extends RPGClass implements Listener {
     }
 
     @Override
-    public void setSubClass(Class subClassType) {
+    public String toString() {
+        return "Ice Wizard";
+    }
 
+    @Override
+    public void processClassUpgrade() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processClassUpgrade'");
     }
 }

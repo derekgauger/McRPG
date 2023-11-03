@@ -1,7 +1,6 @@
 package dirkyg.mcrpg.SpecialAbilities;
 
 import dirkyg.mcrpg.McRPG;
-import dirkyg.mcrpg.Skills.Skill;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -63,8 +62,7 @@ public class HomingArrows extends SpecialAbility implements Listener {
                 player.getEyeLocation(),
                 dir,
                 range,
-                e -> (e instanceof LivingEntity) && e != player
-        );
+                e -> (e instanceof LivingEntity) && e != player);
         if (rayTrace != null) {
             Entity hitEntity = rayTrace.getHitEntity();
             if (hitEntity instanceof LivingEntity) {
@@ -75,12 +73,17 @@ public class HomingArrows extends SpecialAbility implements Listener {
     }
 
     @Override
-    void resetAfterAbilityFinished() {
+    void resetAfterAbilityFinished(Player player) {
 
     }
 
     @Override
-    void processActionDuringAbility() {
+    void processActionDuringAbility(int iterations, Player player) {
 
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 }

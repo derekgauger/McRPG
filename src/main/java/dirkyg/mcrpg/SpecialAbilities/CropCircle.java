@@ -56,12 +56,17 @@ public class CropCircle extends SpecialAbility implements Listener {
     }
 
     @Override
-    void resetAfterAbilityFinished() {
+    void resetAfterAbilityFinished(Player player) {
 
     }
 
     @Override
-    void processActionDuringAbility() {
+    void processActionDuringAbility(int iterations, Player player) {
 
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 }

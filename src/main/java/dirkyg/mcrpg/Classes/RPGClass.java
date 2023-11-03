@@ -2,16 +2,20 @@ package dirkyg.mcrpg.Classes;
 
 import java.util.UUID;
 
+import dirkyg.mcrpg.SpecialAbilities.Swapper;
+
 public abstract class RPGClass {
 
     public UUID uuid;
     public int level = 1;
     public double totalXp = 0;
     private boolean isActive = false;
+    public RPGClass baseClass;
+    public Swapper swapper;
 
     public abstract void activatePlayer();
     public abstract void deactivatePlayer();
-    public abstract void setSubClass(Class subClassType);
+    public abstract void processClassUpgrade();
 
     public void incrementLevel() {
         this.level += 1;

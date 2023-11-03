@@ -16,8 +16,9 @@ import static dirkyg.mcrpg.Utilities.BooleanChecks.isSword;
 
 public class Dash extends SpecialAbility implements Listener {
 
-    private long dashCoolDown = 2;
-    private long nextAvailableUsage;
+    public float dashForce = 2.0f;
+    public long dashCoolDown = 2L;
+    long nextAvailableUsage;
 
     public Dash(UUID uuid, String classifier) {
         super.playerUUID = uuid;
@@ -35,7 +36,8 @@ public class Dash extends SpecialAbility implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        if (player.getUniqueId() != playerUUID || !isHappening || item == null || player.isSneaking() || System.currentTimeMillis() < nextAvailableUsage) {
+        if (player.getUniqueId() != playerUUID || !isHappening || item == null || player.isSneaking()
+                || System.currentTimeMillis() < nextAvailableUsage) {
             return;
         }
         if (event.getAction() == Action.RIGHT_CLICK_AIR && isSword(item.getType())) {
@@ -46,18 +48,22 @@ public class Dash extends SpecialAbility implements Listener {
 
     private void dashPlayer(Player player) {
         Vector dir = player.getLocation().getDirection().normalize();
-        double force = 2.0; // Adjust this value to change the dash force/speed
-        dir.multiply(force);
+        dir.multiply(dashForce);
         player.setVelocity(dir);
     }
 
     @Override
-    void resetAfterAbilityFinished() {
+    void resetAfterAbilityFinished(Player player) {
 
     }
 
     @Override
-    void processActionDuringAbility() {
+    void processActionDuringAbility(int iterations, Player player) {
 
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 }

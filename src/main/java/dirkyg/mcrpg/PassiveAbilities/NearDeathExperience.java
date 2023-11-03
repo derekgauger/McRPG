@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import dirkyg.mcrpg.McRPG;
+import static dirkyg.mcrpg.Utilities.Visuals.*;
 
 public class NearDeathExperience extends PassiveAbility implements Listener {
 
@@ -50,6 +51,7 @@ public class NearDeathExperience extends PassiveAbility implements Listener {
                 immunityCooldownResetTime = immuneUntil + immunityCooldown;
                 PotionEffect immunityEffect = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4);
                 player.addPotionEffect(immunityEffect, true);
+                sendActionBar(player, "&dYou are now immune to entity damage for 10 seconds.");
             }
         }
     }

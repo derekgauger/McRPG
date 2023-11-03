@@ -4,6 +4,8 @@ import static dirkyg.mcrpg.Utilities.BooleanChecks.isAxe;
 import static dirkyg.mcrpg.Utilities.BooleanChecks.isSword;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -12,6 +14,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
@@ -19,7 +22,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Classes.RPGClass;
@@ -41,6 +43,7 @@ public class Ranger extends RPGClass implements Listener {
     Sniper sniper;
 
     Climb climb;
+    private final Set<UUID> processedEntities = new HashSet<>();
 
     public Ranger(UUID uuid) {
         this.uuid = uuid;
@@ -73,18 +76,8 @@ public class Ranger extends RPGClass implements Listener {
     }
 
     @Override
-    public void setSubClass(Class subClassType) {
-        if (activeClass != null) {
-            activeClass.deactivatePlayer();
-        }
-        if (subClassType.equals(Hunter.class)) {
-            activeClass = hunter;
-        } else if (subClassType.equals(Sniper.class)) {
-            activeClass = sniper;
-        } else {
-            return;
-        }
-        activeClass.activatePlayer();
+    public String toString() {
+        return "Ranger";
     }
 
     @EventHandler
@@ -122,6 +115,10 @@ public class Ranger extends RPGClass implements Listener {
     public void processDamageChanges(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
         Entity damager = event.getDamager();
+        Entity entity = event.getEntity();
+        if (!(entity instanceof LivingEntity le) || processedEntities.contains(entity.getUniqueId())) {
+            return;
+        }
         boolean isProjectile = false;
         if (damager instanceof Arrow arrow) {
             damager = (Entity) arrow.getShooter();
@@ -132,13 +129,25 @@ public class Ranger extends RPGClass implements Listener {
             isProjectile = true;
         }
         if (damager == player && isProjectile) {
-            double originalDamage = event.getDamage();
+            event.setCancelled(true);
+            processedEntities.add(entity.getUniqueId());
+            double originalDamage = event.getFinalDamage();
             double modifiedDamage = originalDamage * projectileDamageMultipler;
-            event.setDamage(modifiedDamage);
+            le.damage(modifiedDamage, player);
+            processedEntities.remove(entity.getUniqueId());
         } else if (damager == player) {
-            double originalDamage = event.getDamage();
+            event.setCancelled(true);
+            processedEntities.add(entity.getUniqueId());
+            double originalDamage = event.getFinalDamage();
             double modifiedDamage = originalDamage * meleeDamageMultiplier;
-            event.setDamage(modifiedDamage);
+            le.damage(modifiedDamage, player);
+            processedEntities.remove(entity.getUniqueId());
         }
+    }
+
+    @Override
+    public void processClassUpgrade() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processClassUpgrade'");
     }
 }

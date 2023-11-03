@@ -5,6 +5,7 @@ import static dirkyg.mcrpg.Utilities.Visuals.launchLevelUpFirework;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -16,11 +17,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import dirkyg.mcrpg.McRPG;
+import dirkyg.mcrpg.Classes.RPGClass;
 import dirkyg.mcrpg.CustomAnimals.AnimalBeaconManager;
 
 public class SkillManager implements Listener, CommandExecutor {
 
     public static HashMap<UUID, PlayerSkills> playerSkills = new HashMap<>();
+    public static final double breedingXpMultipler = 3;
+    public static final double buildingxpMultipler = 2;
+    public static final double commereceXpMultipler = 5;
+    public static final double diggingXpMultipler = 2;
+    public static final double farmingXpMultipler = 2;
+    public static final double fishingXpMultipler = 10;
+    public static final double loggingXpMultipler = 3;
+    public static final double miningXpMultipler = 1;
 
     public static int[] levelXPs = new int[] {3, 10, 25, 45, 70, // 0-5
                                             100, 140, 190, 250, 320, // 6-10
@@ -47,20 +57,26 @@ public class SkillManager implements Listener, CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            System.out.println("Only players in game can do that!");
+            McRPG.LOGGER.log(Level.SEVERE, "Only players in game can do that!");
             return false;
         }
         return true;
     }
     private static int calculateLevel(Skill skill) {
         double xp = skill.getTotalXp();
-        for (int i = 1; i < levelXPs.length; i++) {
+        if (xp < levelXPs[0]) {
+            return 0;
+        } else if (xp >= levelXPs[levelXPs.length - 1]) {
+            return 50;
+        }
+
+        for (int i = 0; i < levelXPs.length; i++) {
             int levelXp = levelXPs[i];
             if (levelXp >= xp) {
-                return i;
+                return i + 1;
             }
         }
-        return 0;
+        return -1;
     }
 
     private static boolean reachedNextLevel(Skill skill) {
@@ -72,7 +88,7 @@ public class SkillManager implements Listener, CommandExecutor {
         if (reachedNextLevel(skill)) {
             skill.incrementLevel();
             skill.processAbilityUpgrade();
-            System.out.println(skill.getLevel() + " | " + skill.getTotalXp());
+            McRPG.LOGGER.log(Level.INFO, player.getName() + "|" + skill + "|Skill Level: " + skill.getLevel());
             player.sendMessage(colorText("&dIncreased " + skill + " skill to level " + skill.getLevel() + "!"));
             launchLevelUpFirework(player.getLocation());
         }

@@ -14,8 +14,8 @@ public abstract class SpecialAbility {
     UUID playerUUID;
     final long PROMPT_STAY_UP_TIME = 3000;
     final long AFTER_PROMPT_WAIT_TIME = 350;
-    public int coolDown = 3 * 60 * 1000;
-    public long duration = 5L;
+    public long coolDown = 1;
+    public long duration = 60;
     boolean isHappening;
     long stopTime;
     long promptInputDelayUtil;
@@ -25,7 +25,7 @@ public abstract class SpecialAbility {
 
     public void processAbility(Cancellable event, Player player, String actionNeeded) {
         long currentTime = System.currentTimeMillis();
-        long nextAvailableUsageTime = stopTime + coolDown;
+        long nextAvailableUsageTime = stopTime + (coolDown * 60 * 1000);
         long resetPromptTime = promptInputDelayUtil + PROMPT_STAY_UP_TIME;
         if (currentTime < promptInputDelayUtil) {
             return;
@@ -50,7 +50,9 @@ public abstract class SpecialAbility {
         isHappening = true;
         event.setCancelled(true);
         stopTime = currentTime + (duration * 1000L);
+        initalizeAbility(player);
         new BukkitRunnable() {
+            int iterations = 0;
             @Override
             public void run() {
                 if (System.currentTimeMillis() >= stopTime) {
@@ -59,17 +61,23 @@ public abstract class SpecialAbility {
                 }
                 if (!isHappening) {
                     this.cancel();
-                    resetAfterAbilityFinished();
+                    resetAfterAbilityFinished(player);
                     return;
                 }
-                processActionDuringAbility();
-                sendActionBar(player, "&dYou have " + (((stopTime - System.currentTimeMillis()) / 1000) + 1) + " seconds left on your " + abilityName + " - " + classifier + " ability!");
+                processActionDuringAbility(iterations, player);
+                if (iterations % 20 == 0) {
+                    sendActionBar(player, "&dYou have " + (((stopTime - System.currentTimeMillis()) / 1000) + 1) + " seconds left on your " + abilityName + " - " + classifier + " ability!");
+                }
+                iterations++;
             }
-        }.runTaskTimer(McRPG.plugin, 0, 20);
+        }.runTaskTimer(McRPG.plugin, 0, 1L);
     }
 
-    abstract void resetAfterAbilityFinished();
-    abstract void processActionDuringAbility();
+    abstract void resetAfterAbilityFinished(Player player);
+
+    abstract void processActionDuringAbility(int iterations, Player player);
+
+    abstract void initalizeAbility(Player player);
 
     public boolean isHappening() {
         return isHappening;

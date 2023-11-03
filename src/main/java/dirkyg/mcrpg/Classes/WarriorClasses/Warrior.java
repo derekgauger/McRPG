@@ -1,48 +1,40 @@
 package dirkyg.mcrpg.Classes.WarriorClasses;
 
-import static dirkyg.mcrpg.Utilities.BooleanChecks.isSword;
-
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Classes.RPGClass;
 import dirkyg.mcrpg.PassiveAbilities.NearDeathExperience;
-import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
-import dirkyg.mcrpg.SpecialAbilities.Dash;
+import dirkyg.mcrpg.SpecialAbilities.Berserk;
 
 public class Warrior extends RPGClass implements Listener {
 
     UUID uuid;
-    private final float damageMultiplier = 2.0f;
-    private final float baseSpeed = .13f;
+    private float damageMultiplier = 2.0f;
+    private float baseSpeed = .13f;
+    private final Set<UUID> processedEntities = new HashSet<>();
 
     private float projectileReductionMultiplier = .5f;
 
-    RPGClass activeClass;
-    Berserker berserker;
-    Elemental elemental;
-
-    SpecialAbility dash;
     NearDeathExperience nearDeathExperience;
+    RPGClass activeClass;
 
-    public Warrior(UUID uuid) {
+    public Warrior(UUID uuid, RPGClass activeClass) {
         this.uuid = uuid;
-        berserker = new Berserker(uuid);
-        elemental = new Elemental(uuid);
-        dash = new Dash(uuid, this.toString());
+        this.activeClass = activeClass;
         nearDeathExperience = new NearDeathExperience(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -74,54 +66,35 @@ public class Warrior extends RPGClass implements Listener {
         }
     }
 
-    @Override
-    public void setSubClass(Class subClassType) {
-        if (activeClass != null) {
-            activeClass.deactivatePlayer();
-        }
-        if (subClassType.equals(Berserker.class)) {
-            activeClass = berserker;
-        } else if (subClassType.equals(Elemental.class)) {
-            activeClass = elemental;
-        } else {
-            return;
-        }
-        activeClass.activatePlayer();
-    }
-
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (!isCurrentlyActive()) {
-            return;
-        }
-        Player player = event.getPlayer();
-        ItemStack item = event.getItem();
-        if (item == null || !isSword(item.getType()) || !player.isSneaking() || dash.isHappening()) {
-            return;
-        }
-        if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-            dash.processAbility(event, player, "Right Click");
-        }
-    }
-
     public void processDamageChanges(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
         Entity damager = event.getDamager();
+        Entity damaged = event.getEntity();
+        if (!(damaged instanceof LivingEntity le) || processedEntities.contains(damaged.getUniqueId())) {
+            return;
+        }
         if (damager instanceof Arrow arrow) {
-            double originalDamage = event.getDamage();
+            double originalDamage = event.getFinalDamage();
             double modifiedDamage = originalDamage * projectileReductionMultiplier;
-            event.setDamage(modifiedDamage);
+            processedEntities.add(damaged.getUniqueId());
+            le.damage(modifiedDamage, player);
+            processedEntities.remove(damaged.getUniqueId());
+            event.setCancelled(true);
+            return;
         }
         if (damager instanceof Trident trident) {
             damager = (Entity) trident.getShooter();
         }
-        if (damager == player) {
-            double originalDamage = event.getDamage();
+        if (damager == player && !(activeClass.swapper.activeAbility instanceof Berserk
+                && activeClass.swapper.activeAbility.isHappening())) {
+            double originalDamage = event.getFinalDamage();
             double modifiedDamage = originalDamage * damageMultiplier;
-            event.setDamage(modifiedDamage);
+            processedEntities.add(damaged.getUniqueId());
+            le.damage(modifiedDamage, player);
+            processedEntities.remove(damaged.getUniqueId());
+            event.setCancelled(true);
         }
     }
-
 
     @EventHandler
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
@@ -129,5 +102,9 @@ public class Warrior extends RPGClass implements Listener {
             return;
         }
         processDamageChanges(event);
+    }
+
+    @Override
+    public void processClassUpgrade() {
     }
 }

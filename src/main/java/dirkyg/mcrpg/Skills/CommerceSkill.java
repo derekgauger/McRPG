@@ -55,7 +55,7 @@ public class CommerceSkill extends Skill implements Listener {
                         sendActionBar(player, "&dYou got some cash back!");
                     }
                 }
-                SkillManager.processSkillIncrement(player, this, 3);
+                SkillManager.processSkillIncrement(player, this, SkillManager.commereceXpMultipler);
             }
         }
     }

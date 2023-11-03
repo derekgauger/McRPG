@@ -1,7 +1,7 @@
 package dirkyg.mcrpg.Skills;
 
 import static dirkyg.mcrpg.Utilities.BooleanChecks.isAxe;
-import static dirkyg.mcrpg.Utilities.BooleanChecks.isWood;
+import static dirkyg.mcrpg.Utilities.BooleanChecks.isPlaced;
 import static dirkyg.mcrpg.Utilities.Visuals.colorText;
 
 import java.util.UUID;
@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
 import dirkyg.mcrpg.SpecialAbilities.TreeCapitator;
+import dirkyg.mcrpg.Utilities.BlockPoints.LoggingBlockPoints;
 
 public class LoggingSkill extends Skill implements Listener {
 
@@ -45,11 +46,16 @@ public class LoggingSkill extends Skill implements Listener {
         ItemStack usedItem = player.getInventory().getItemInMainHand();
         Material usedItemType = usedItem.getType();
         Block brokenBlock = event.getBlock();
-        if (isWood(brokenBlock.getType()) && isAxe(usedItemType)) {
-            SkillManager.processSkillIncrement(player, this, 1);
+        String blockTypeName = brokenBlock.getType().toString();
+        if (isPlaced(brokenBlock)) {
+            return;
+        }
+        if (LoggingBlockPoints.contains(blockTypeName) && isAxe(usedItemType)) {
+            double incrementAmount = LoggingBlockPoints.getEnumpoints(blockTypeName);
+            SkillManager.processSkillIncrement(player, this, incrementAmount * SkillManager.loggingXpMultipler);
         }
     }
-
+    
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();

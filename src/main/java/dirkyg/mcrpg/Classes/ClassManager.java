@@ -1,9 +1,12 @@
 package dirkyg.mcrpg.Classes;
 
 import static dirkyg.mcrpg.Utilities.Common.createGUIItem;
+import static dirkyg.mcrpg.Utilities.Visuals.colorText;
+import static dirkyg.mcrpg.Utilities.Visuals.launchLevelUpFirework;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,31 +18,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Classes.HealerClasses.Cleric;
-import dirkyg.mcrpg.Classes.HealerClasses.Healer;
 import dirkyg.mcrpg.Classes.HealerClasses.Necromancer;
 import dirkyg.mcrpg.Classes.RangerClasses.Hunter;
-import dirkyg.mcrpg.Classes.RangerClasses.Ranger;
 import dirkyg.mcrpg.Classes.RangerClasses.Sniper;
 import dirkyg.mcrpg.Classes.RogueClasses.Assassin;
-import dirkyg.mcrpg.Classes.RogueClasses.Rogue;
 import dirkyg.mcrpg.Classes.RogueClasses.Trickster;
 import dirkyg.mcrpg.Classes.WarriorClasses.Berserker;
 import dirkyg.mcrpg.Classes.WarriorClasses.Elemental;
-import dirkyg.mcrpg.Classes.WarriorClasses.Warrior;
 import dirkyg.mcrpg.Classes.WizardClasses.FireWizard;
 import dirkyg.mcrpg.Classes.WizardClasses.IceWizard;
-import dirkyg.mcrpg.Classes.WizardClasses.Wizard;
 
 public class ClassManager implements Listener, CommandExecutor {
 
-    private final Inventory classGUI = Bukkit.createInventory(null, 9, "Class Picker");
-    public static HashMap<UUID, PlayerClasses> charactersClasses = new HashMap<>();
-    public static HashMap<UUID, RPGClass> activeClasses = new HashMap<>();
+    public static HashMap<UUID, PlayerClasses> playerClasses = new HashMap<>();
+    public static final int maxLevel = 5;
+    public static int[] levelXPs = new int[] {5000, 12500, 25000, 40000};
 
     public ClassManager() {
         Bukkit.getServer().getPluginCommand("class").setExecutor(this);
@@ -50,7 +48,7 @@ public class ClassManager implements Listener, CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if (!(sender instanceof Player player)) {
-            System.out.println("Only players in game can do that!");
+            McRPG.LOGGER.log(Level.SEVERE, "Only players in game can do that!");
             return false;
         }
         if (label.equalsIgnoreCase("class")) {
@@ -60,15 +58,6 @@ public class ClassManager implements Listener, CommandExecutor {
         return true;
     }
 
-    private String getClassStatusString(boolean isActive) {
-        if (isActive) {
-            return "&aActive";
-        } else {
-            return "&4Inactive";
-        }
-    }
-
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         HumanEntity he = event.getWhoClicked();
@@ -77,7 +66,12 @@ public class ClassManager implements Listener, CommandExecutor {
         }
         if (event.getView().getTitle().equalsIgnoreCase("Select a Class")) {
             event.setCancelled(true);  // Cancel the event so items can't be taken
-            switch (event.getCurrentItem().getType()) {
+            ItemStack currentItem = event.getCurrentItem();
+            if (currentItem == null) {
+                return;
+            }
+            Material type = currentItem.getType();
+            switch (type) {
                 case NETHERITE_AXE:
                     player.openInventory(getSubClassSelectionGUI("Warrior"));
                     break;
@@ -96,75 +90,78 @@ public class ClassManager implements Listener, CommandExecutor {
                 case BARRIER:
                     player.closeInventory();
                     break;
+                default:
+                    break;
             }
         } else if (event.getView().getTitle().startsWith("Select a Subclass for ")) {
             event.setCancelled(true);
-            RPGClass activeClass = activeClasses.get(player.getUniqueId());
-            RPGClass warrior = getPlayerClassByType(player, Warrior.class);
-            RPGClass rogue = getPlayerClassByType(player, Rogue.class);
-            RPGClass ranger = getPlayerClassByType(player, Ranger.class);
-            RPGClass healer = getPlayerClassByType(player, Healer.class);
-            RPGClass wizard = getPlayerClassByType(player, Wizard.class);
-            if (event.getCurrentItem().getType() != Material.ARROW && event.getCurrentItem().getType() != Material.AIR) {
+            UUID uuid = player.getUniqueId();
+            if (!playerClasses.containsKey(uuid)) {
+                playerClasses.put(uuid, new PlayerClasses(uuid));
+            }
+            PlayerClasses pc = playerClasses.get(uuid);
+            RPGClass activeClass = pc.activeClass;
+            ItemStack currentItem = event.getCurrentItem();
+            if (currentItem == null) {
+                return;
+            }
+            Material type = currentItem.getType();
+            if (type != Material.ARROW && type != Material.AIR) {
                 if (activeClass != null) {
                     activeClass.deactivatePlayer();
                 }
                 player.closeInventory();
             }
-            switch (event.getCurrentItem().getType()) {
+            switch (type) {
                 case END_CRYSTAL:
-                    warrior.setSubClass(Elemental.class);
-                    warrior.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), warrior);
+                    pc.activeClass = getPlayerClassByType(player, Elemental.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case NETHERITE_SWORD:
-                    warrior.setSubClass(Berserker.class);
-                    warrior.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), warrior);
+                    pc.activeClass = getPlayerClassByType(player, Berserker.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case IRON_SWORD:
-                    rogue.setSubClass(Assassin.class);
-                    rogue.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), rogue);
+                    pc.activeClass = getPlayerClassByType(player, Assassin.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case ENDER_PEARL:
-                    rogue.setSubClass(Trickster.class);
-                    rogue.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), rogue);
+                    pc.activeClass = getPlayerClassByType(player, Trickster.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case SPYGLASS:
-                    ranger.setSubClass(Sniper.class);
-                    ranger.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), ranger);
+                    pc.activeClass = getPlayerClassByType(player, Sniper.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case BOW:
-                    ranger.setSubClass(Hunter.class);
-                    ranger.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), ranger);
+                    pc.activeClass = getPlayerClassByType(player, Hunter.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case ENCHANTED_GOLDEN_APPLE:
-                    healer.setSubClass(Cleric.class);
-                    healer.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), healer);
+                    pc.activeClass = getPlayerClassByType(player, Cleric.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case CHORUS_FRUIT:
-                    healer.setSubClass(Necromancer.class);
-                    healer.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), healer);
+                    pc.activeClass = getPlayerClassByType(player, Necromancer.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case BLAZE_POWDER:
-                    wizard.setSubClass(FireWizard.class);
-                    wizard.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), wizard);
+                    pc.activeClass = getPlayerClassByType(player, FireWizard.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case ICE:
-                    wizard.setSubClass(IceWizard.class);
-                    wizard.activatePlayer();
-                    activeClasses.put(player.getUniqueId(), wizard);
+                    pc.activeClass = getPlayerClassByType(player, IceWizard.class);
+                    pc.activeClass.activatePlayer();
                     break;
                 case ARROW:
                     event.getWhoClicked().openInventory(getClassSelectionGUI());
                     break;
+                default:
+                    break;
+            }
+            if (!pc.activeClass.equals(activeClass)) {
+                player.sendMessage(colorText("&dYou have selected the " + pc.activeClass + " class!"));
+                McRPG.LOGGER.info(player.getName() + "|Activated Class: " + pc.activeClass);
             }
         }
     }
@@ -206,77 +203,50 @@ public class ClassManager implements Listener, CommandExecutor {
         return inv;
     }
 
-    public RPGClass getPlayerClassByType(Player player, Class classType) {
+    public <T> RPGClass getPlayerClassByType(Player player, Class<T> classType) {
         UUID uuid = player.getUniqueId();
-        if (!charactersClasses.containsKey(uuid)) {
-            charactersClasses.put(uuid, new PlayerClasses(uuid));
+        if (!playerClasses.containsKey(uuid)) {
+            playerClasses.put(uuid, new PlayerClasses(uuid));
         }
-        PlayerClasses pc = charactersClasses.get(player.getUniqueId());
-        if (classType.equals(Warrior.class)) {
-            return pc.getWarrior();
-        } else if (classType.equals(Rogue.class)) {
-            return pc.getRogue();
-        } else if (classType.equals(Ranger.class)) {
-            return pc.getRanger();
-        } else if (classType.equals(Healer.class)) {
-            return pc.getHealer();
-        } else if (classType.equals(Wizard.class)) {
-            return pc.getWizard();
+        PlayerClasses pc = playerClasses.get(player.getUniqueId());
+        for (RPGClass c : pc.allClasses) {
+            if (classType.equals(c.getClass())) {
+                return c;
+            }
         }
         return null;
     }
 
-
-//    @EventHandler
-//    public void onInventoryClick(InventoryClickEvent event) {
-//        event.setCancelled(true);
-//        ItemStack clickedItem = event.getCurrentItem();
-//        if (clickedItem == null || clickedItem.getType() == Material.AIR) {
-//            return;
-//        }
-//        Player player = (Player) event.getWhoClicked();
-//        UUID playerUUID = player.getUniqueId();
-//        ItemMeta itemMeta = clickedItem.getItemMeta();
-//        if (itemMeta == null) {
-//            return;
-//        }
-//        String itemName = itemMeta.getDisplayName();
-//        RPGClass newlyActivated = null;
-//        String activateMsg = "";
-//        if (itemName.contains("Warrior")) {
-//            newlyActivated = getPlayerClassByType(player, Warrior.class);
-//            activateMsg = "&6The warrior class is now activated.";
-//        } else if (itemName.contains("Rogue")) {
-//            newlyActivated = getPlayerClassByType(player, new Rogue(null));
-//            activateMsg = "&9The rogue class is now activated.";
-//        } else if (itemName.contains("Monk")) {
-//            newlyActivated = getPlayerClassByType(player, new Healer(null));
-//            activateMsg = "&5The monk class is now activated.";
-//        } else if (itemName.contains("Wizard")) {
-//            newlyActivated = getPlayerClassByType(player, new Wizard(null));
-//            activateMsg = "&2The wizard class is now activated.";
-//        }
-//        RPGClass currentClass = activeClasses.get(playerUUID);
-//
-//        if (currentClass != null) {
-//            currentClass.deactivatePlayer();
-//        }
-//        if (newlyActivated != null) {
-//            newlyActivated.activatePlayer();
-//            activeClasses.put(playerUUID, newlyActivated);
-//            player.sendMessage(activateMsg));
-//        }
-//        initializeClassGUI(player);
-//    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        if (!activeClasses.containsKey(uuid)) {
-            return;
+    private static int calculateLevel(RPGClass activeClass) {
+        double xp = activeClass.getTotalXp();
+        if (xp < levelXPs[0]) {
+            return 0;
+        } else if (xp >= levelXPs[levelXPs.length - 1]) {
+            return maxLevel;
         }
-        RPGClass currentClass = activeClasses.get(uuid);
-        currentClass.activatePlayer();
+
+        for (int i = 0; i < levelXPs.length; i++) {
+            int levelXp = levelXPs[i];
+            if (levelXp >= xp) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
+    private static boolean reachedNextLevel(RPGClass activeClass) {
+        McRPG.LOGGER.info("lvl: " + activeClass.getLevel() + " | " + calculateLevel(activeClass));
+        return (activeClass.getLevel() < calculateLevel(activeClass));
+    }
+
+    public static void processClassIncrement(Player player, RPGClass activeClass, double incrementAmount) {
+        activeClass.addXp(incrementAmount);
+        if (reachedNextLevel(activeClass)) {
+            activeClass.incrementLevel();
+            activeClass.processClassUpgrade(); 
+            McRPG.LOGGER.log(Level.INFO, player.getName() + "|" + activeClass + "|Class Level: " + activeClass.getLevel());
+            player.sendMessage(colorText("&dIncreased " + activeClass + "class to level " + activeClass.getLevel() + "!"));
+            launchLevelUpFirework(player.getLocation());
+        }
     }
 }

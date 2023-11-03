@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -71,7 +72,7 @@ public class SchematicWorldGenerator implements CommandExecutor {
         out.writeObject(createdWorldNames);
         out.close();
         fileOut.close();
-        System.out.println("Saved information to " + createdWorldNamesFile);
+        McRPG.LOGGER.info("Saved information to " + createdWorldNamesFile);
     }
 
     public static void deserializeWorldNames() throws IOException, ClassNotFoundException {
@@ -80,7 +81,7 @@ public class SchematicWorldGenerator implements CommandExecutor {
         createdWorldNames = (List<String>) in.readObject();
         in.close();
         fileIn.close();
-        System.out.println("Loaded information from " + createdWorldNamesFile);
+        McRPG.LOGGER.info("Loaded information from " + createdWorldNamesFile);
     }
 
     public static class EmptyChunkGenerator extends ChunkGenerator {
@@ -98,7 +99,7 @@ public class SchematicWorldGenerator implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            System.out.println("Only players in game can do that!");
+            McRPG.LOGGER.log(Level.SEVERE, "Only players in game can do that!");
             return false;
         }
         if (label.equalsIgnoreCase("genworld")) {
@@ -135,7 +136,7 @@ public class SchematicWorldGenerator implements CommandExecutor {
             createdWorldNames.add(worldName);
             return world;
         } catch (Exception e) {
-            System.out.println("There was an error while creating the world '" + worldName + "'!");
+            McRPG.LOGGER.log(Level.SEVERE, "There was an error while creating the world '" + worldName + "'!");
         }
         return null;
     }

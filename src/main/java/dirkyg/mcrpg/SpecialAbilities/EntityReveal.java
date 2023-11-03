@@ -1,15 +1,14 @@
 package dirkyg.mcrpg.SpecialAbilities;
 
-import dirkyg.mcrpg.Skills.Skill;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-public class EntityReveal extends SpecialAbility{
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+
+public class EntityReveal extends SpecialAbility {
 
     HashSet<UUID> glowingEntities;
 
@@ -26,13 +25,12 @@ public class EntityReveal extends SpecialAbility{
     }
 
     @Override
-    void resetAfterAbilityFinished() {
+    void resetAfterAbilityFinished(Player player) {
         disableEntityGlow();
     }
 
     @Override
-    void processActionDuringAbility() {
-        Player player = Bukkit.getPlayer(playerUUID);
+    void processActionDuringAbility(int iterations, Player player) {
         if (player != null) {
             enableEntityGlow(player.getNearbyEntities(200, 200, 200));
         }
@@ -48,7 +46,7 @@ public class EntityReveal extends SpecialAbility{
         }
     }
 
-    private void disableEntityGlow() {
+    public void disableEntityGlow() {
         for (UUID uuid : glowingEntities) {
             Entity entity = Bukkit.getEntity(uuid);
             if (entity != null) {
@@ -56,6 +54,11 @@ public class EntityReveal extends SpecialAbility{
             }
         }
         glowingEntities.clear();
+    }
+
+    @Override
+    void initalizeAbility(Player player) {
+        // TODO Auto-generated method stub
     }
 
 }

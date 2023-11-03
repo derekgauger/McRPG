@@ -3,12 +3,15 @@ package dirkyg.mcrpg.Classes.RogueClasses;
 import static dirkyg.mcrpg.Utilities.BooleanChecks.isAxe;
 import static dirkyg.mcrpg.Utilities.BooleanChecks.isSword;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
@@ -21,9 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Classes.RPGClass;
-import dirkyg.mcrpg.PassiveAbilities.Climb;
 import dirkyg.mcrpg.PassiveAbilities.DoubleJump;
-import dirkyg.mcrpg.PassiveAbilities.InvisibleMovement;
 
 public class Rogue extends RPGClass implements Listener {
 
@@ -33,33 +34,27 @@ public class Rogue extends RPGClass implements Listener {
     float heavyWeaponSpeed = .15f;
 
     RPGClass activeClass;
-    Assassin assassin;
-    Trickster trickster;
 
     DoubleJump doubleJump;
-    Climb climb;
-    InvisibleMovement invisibleMovement;
+
+    private final Set<UUID> processedEntities = new HashSet<>();
 
     public Rogue(UUID uuid) {
         this.uuid = uuid;
-        assassin = new Assassin(uuid);
-        trickster = new Trickster(uuid);
         doubleJump = new DoubleJump(uuid);
-        climb = new Climb(uuid);
-        invisibleMovement = new InvisibleMovement(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
     @Override
     public void activatePlayer() {
         Player player = Bukkit.getPlayer(uuid);
+        System.out.println(1);
         if (player != null) {
             player.setWalkSpeed(baseSpeed);
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(14);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, PotionEffect.INFINITE_DURATION, 1));
+            player.addPotionEffect(
+                    new PotionEffect(PotionEffectType.WATER_BREATHING, PotionEffect.INFINITE_DURATION, 1));
             doubleJump.start();
-            climb.start();
-            invisibleMovement.start();
             setCurrentlyActive(true);
         }
     }
@@ -73,39 +68,34 @@ public class Rogue extends RPGClass implements Listener {
             player.setInvisible(false);
             player.removePotionEffect(PotionEffectType.WATER_BREATHING);
             doubleJump.stop();
-            climb.stop();
-            invisibleMovement.stop();
             setCurrentlyActive(false);
         }
     }
 
     @Override
-    public void setSubClass(Class subClassType) {
-        if (activeClass != null) {
-            activeClass.deactivatePlayer();
-        }
-        if (subClassType.equals(Assassin.class)) {
-            activeClass = assassin;
-        } else if (subClassType.equals(Trickster.class)) {
-            activeClass = trickster;
-        } else {
-            return;
-        }
-        activeClass.activatePlayer();
+    public String toString() {
+        return "Rogue";
     }
 
     public void reduceDamage(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
         Entity damager = event.getDamager();
+        Entity entity = event.getEntity();
+        if (!(entity instanceof LivingEntity le) || processedEntities.contains(entity.getUniqueId())) {
+            return;
+        }
         if (damager instanceof Arrow arrow) {
             damager = (Entity) arrow.getShooter();
         } else if (damager instanceof Trident trident) {
             damager = (Entity) trident.getShooter();
         }
         if (damager == player) {
-            double originalDamage = event.getDamage();
+            processedEntities.add(le.getUniqueId());
+            double originalDamage = event.getFinalDamage();
             double modifiedDamage = originalDamage * damageMultiplier;
-            event.setDamage(modifiedDamage);
+            le.damage(modifiedDamage, player);
+            processedEntities.remove(le.getUniqueId());
+            event.setCancelled(true);
         }
     }
 
@@ -134,9 +124,16 @@ public class Rogue extends RPGClass implements Listener {
             return;
         }
         if (player.hasPotionEffect(PotionEffectType.WATER_BREATHING)) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, PotionEffect.INFINITE_DURATION, 1));
+            player.addPotionEffect(
+                    new PotionEffect(PotionEffectType.WATER_BREATHING, PotionEffect.INFINITE_DURATION, 1));
 
         }
         processHeavyWeaponsOut(event);
+    }
+
+    @Override
+    public void processClassUpgrade() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processClassUpgrade'");
     }
 }

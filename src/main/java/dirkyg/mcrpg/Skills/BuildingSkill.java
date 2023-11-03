@@ -45,7 +45,7 @@ public class BuildingSkill extends Skill implements Listener {
             if (randomNumber < percentJumpBoostChance) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, 1));
             }
-            SkillManager.processSkillIncrement(player, this, 1);
+            SkillManager.processSkillIncrement(player, this, SkillManager.buildingxpMultipler);
         }
     }
 

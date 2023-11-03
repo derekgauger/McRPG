@@ -42,56 +42,56 @@ public class BooleanChecks {
         };
     }
 
-    public static boolean isWood(Material material) {
-        boolean retVal = false;
-        switch (material) {
-            case OAK_LOG, SPRUCE_LOG, BIRCH_LOG, JUNGLE_LOG, ACACIA_LOG, DARK_OAK_LOG, CRIMSON_STEM, WARPED_STEM, OAK_WOOD, SPRUCE_WOOD, BIRCH_WOOD, JUNGLE_WOOD, ACACIA_WOOD, DARK_OAK_WOOD, CRIMSON_HYPHAE, WARPED_HYPHAE -> {
-                retVal = true;
-            }
-            default -> {}
-        };
-        if (!retVal && (material.name().contains("LOG")) || material.name().contains("WOOD")){
-            retVal = true;
-        }
-        return retVal;
-    }
+    // public static boolean isWood(Material material) {
+    //     boolean retVal = false;
+    //     switch (material) {
+    //         case OAK_LOG, SPRUCE_LOG, BIRCH_LOG, JUNGLE_LOG, ACACIA_LOG, DARK_OAK_LOG, CRIMSON_STEM, WARPED_STEM, OAK_WOOD, SPRUCE_WOOD, BIRCH_WOOD, JUNGLE_WOOD, ACACIA_WOOD, DARK_OAK_WOOD, CRIMSON_HYPHAE, WARPED_HYPHAE -> {
+    //             retVal = true;
+    //         }
+    //         default -> {}
+    //     };
+    //     if (!retVal && (material.name().contains("LOG")) || material.name().contains("WOOD")){
+    //         retVal = true;
+    //     }
+    //     return retVal;
+    // }
 
-    public static boolean isMineMat(Material material) {
-        boolean retVal = false;
-        switch (material) {
-            case COAL_ORE, COPPER_ORE, STONE, COBBLESTONE, DIORITE, ANDESITE, GRANITE, IRON_ORE, GOLD_ORE, DIAMOND_ORE, LAPIS_ORE, REDSTONE_ORE, NETHER_QUARTZ_ORE, EMERALD_ORE, OBSIDIAN, END_STONE, ANCIENT_DEBRIS, CRYING_OBSIDIAN, BLACKSTONE, DEEPSLATE, TUFF, CALCITE, DEEPSLATE_LAPIS_ORE, DEEPSLATE_COAL_ORE, DEEPSLATE_IRON_ORE, DEEPSLATE_GOLD_ORE, DEEPSLATE_EMERALD_ORE, DEEPSLATE_DIAMOND_ORE, DEEPSLATE_REDSTONE_ORE, DEEPSLATE_COPPER_ORE, NETHER_GOLD_ORE, BASALT, SMOOTH_BASALT, SANDSTONE, RED_SANDSTONE, COBBLED_DEEPSLATE -> {
-                retVal = true;
-            }
-            default -> {}
-        }
-        if (!retVal && (material.name().contains("CONCRETE") || material.name().contains("TERRACOTTA"))) {
-            if (!material.name().contains("POWDER")) {
-                retVal = true;
-            }
-        }
-        return retVal;
-    }
+    // public static boolean isMineMat(Material material) {
+    //     boolean retVal = false;
+    //     switch (material) {
+    //         case COAL_ORE, COPPER_ORE, STONE, COBBLESTONE, DIORITE, ANDESITE, GRANITE, IRON_ORE, GOLD_ORE, DIAMOND_ORE, LAPIS_ORE, REDSTONE_ORE, NETHER_QUARTZ_ORE, EMERALD_ORE, OBSIDIAN, END_STONE, ANCIENT_DEBRIS, CRYING_OBSIDIAN, BLACKSTONE, DEEPSLATE, TUFF, CALCITE, DEEPSLATE_LAPIS_ORE, DEEPSLATE_COAL_ORE, DEEPSLATE_IRON_ORE, DEEPSLATE_GOLD_ORE, DEEPSLATE_EMERALD_ORE, DEEPSLATE_DIAMOND_ORE, DEEPSLATE_REDSTONE_ORE, DEEPSLATE_COPPER_ORE, NETHER_GOLD_ORE, BASALT, SMOOTH_BASALT, SANDSTONE, RED_SANDSTONE, COBBLED_DEEPSLATE -> {
+    //             retVal = true;
+    //         }
+    //         default -> {}
+    //     }
+    //     if (!retVal && (material.name().contains("CONCRETE") || material.name().contains("TERRACOTTA"))) {
+    //         if (!material.name().contains("POWDER")) {
+    //             retVal = true;
+    //         }
+    //     }
+    //     return retVal;
+    // }
 
-    public static boolean isDigMat(Material material) {
-        boolean retVal = false;
-        switch (material) {
-            case SAND, RED_SAND, GRAVEL, DIRT, COARSE_DIRT, MYCELIUM, SNOW, POWDER_SNOW, SNOW_BLOCK, SOUL_SAND, SOUL_SOIL, ROOTED_DIRT, FARMLAND, MUD, CLAY, DIRT_PATH, PODZOL, GRASS_BLOCK -> {
-                retVal = true;
-            }
-            default -> {}
-        };
-        if (!retVal && material.name().contains("POWDER")) {
-            retVal = true;
-        }
-        return retVal;
-    }
+    // public static boolean isDigMat(Material material) {
+    //     boolean retVal = false;
+    //     switch (material) {
+    //         case SAND, RED_SAND, GRAVEL, DIRT, COARSE_DIRT, MYCELIUM, SNOW, POWDER_SNOW, SNOW_BLOCK, SOUL_SAND, SOUL_SOIL, ROOTED_DIRT, FARMLAND, MUD, CLAY, DIRT_PATH, PODZOL, GRASS_BLOCK -> {
+    //             retVal = true;
+    //         }
+    //         default -> {}
+    //     };
+    //     if (!retVal && material.name().contains("POWDER")) {
+    //         retVal = true;
+    //     }
+    //     return retVal;
+    // }
 
-    public static boolean isLog(Material material) {
-        return switch (material) {
-            case OAK_LOG, SPRUCE_LOG, BIRCH_LOG, JUNGLE_LOG, ACACIA_LOG, DARK_OAK_LOG, CRIMSON_STEM, WARPED_STEM -> true;
-            default -> false;
-        };
-    }
+    // public static boolean isLog(Material material) {
+    //     return switch (material) {
+    //         case OAK_LOG, SPRUCE_LOG, BIRCH_LOG, JUNGLE_LOG, ACACIA_LOG, DARK_OAK_LOG, CRIMSON_STEM, WARPED_STEM -> true;
+    //         default -> false;
+    //     };
+    // }
 
     public static boolean isBreedable(EntityType entityType) {
         return switch (entityType) {

@@ -6,6 +6,8 @@ import static dirkyg.mcrpg.Utilities.Common.getRandomNumber;
 import static dirkyg.mcrpg.Utilities.Common.getTargetEntity;
 import static dirkyg.mcrpg.Utilities.Visuals.colorText;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -16,6 +18,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
@@ -41,7 +44,9 @@ public class Wizard extends RPGClass implements Listener {
     FireWizard fireWizard;
     IceWizard iceWizard;
 
-    public Wizard (UUID uuid) {
+    private final Set<UUID> processedEntities = new HashSet<>();
+
+    public Wizard(UUID uuid) {
         this.uuid = uuid;
         fireWizard = new FireWizard(uuid);
         iceWizard = new IceWizard(uuid);
@@ -67,32 +72,29 @@ public class Wizard extends RPGClass implements Listener {
     }
 
     @Override
-    public void setSubClass(Class subClassType) {
-        if (activeClass != null) {
-            activeClass.deactivatePlayer();
-        }
-        if (subClassType.equals(FireWizard.class)) {
-            activeClass = fireWizard;
-        } else if (subClassType.equals(IceWizard.class)) {
-            activeClass = iceWizard;
-        } else {
-            return;
-        }
-        activeClass.activatePlayer();
+    public String toString() {
+        return "Wizard";
     }
 
     public void reduceDamage(EntityDamageByEntityEvent event) {
         Player player = Bukkit.getPlayer(uuid);
         Entity damager = event.getDamager();
+        Entity entity = event.getEntity();
+        if (!(entity instanceof LivingEntity le) || processedEntities.contains(entity.getUniqueId())) {
+            return;
+        }
         if (damager instanceof Arrow arrow) {
             damager = (Entity) arrow.getShooter();
         } else if (damager instanceof Trident trident) {
             damager = (Entity) trident.getShooter();
         }
         if (damager == player) {
-            double originalDamage = event.getDamage();
+            processedEntities.add(le.getUniqueId());
+            double originalDamage = event.getFinalDamage();
             double modifiedDamage = originalDamage * damageMultiplier;
-            event.setDamage(modifiedDamage);
+            le.damage(modifiedDamage, player);
+            processedEntities.remove(le.getUniqueId());
+            event.setCancelled(true);
         }
     }
 
@@ -159,5 +161,11 @@ public class Wizard extends RPGClass implements Listener {
                 }
             }
         }
+    }
+
+    @Override
+    public void processClassUpgrade() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processClassUpgrade'");
     }
 }
