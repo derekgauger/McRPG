@@ -38,17 +38,11 @@ public class Ranger extends RPGClass implements Listener {
                                         Biome.TAIGA, Biome.OLD_GROWTH_PINE_TAIGA, Biome.OLD_GROWTH_SPRUCE_TAIGA, Biome.SNOWY_TAIGA, Biome.JUNGLE,
                                         Biome.BAMBOO_JUNGLE, Biome.SPARSE_JUNGLE};
 
-    RPGClass activeClass;
-    Hunter hunter;
-    Sniper sniper;
-
     Climb climb;
     private final Set<UUID> processedEntities = new HashSet<>();
 
     public Ranger(UUID uuid) {
         this.uuid = uuid;
-        hunter = new Hunter(uuid);
-        sniper = new Sniper(uuid);
         climb = new Climb(uuid);
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
@@ -129,11 +123,11 @@ public class Ranger extends RPGClass implements Listener {
             isProjectile = true;
         }
         if (damager == player && isProjectile) {
-            event.setCancelled(true);
             processedEntities.add(entity.getUniqueId());
             double originalDamage = event.getFinalDamage();
             double modifiedDamage = originalDamage * projectileDamageMultipler;
             le.damage(modifiedDamage, player);
+            event.setDamage(0);
             processedEntities.remove(entity.getUniqueId());
         } else if (damager == player) {
             event.setCancelled(true);

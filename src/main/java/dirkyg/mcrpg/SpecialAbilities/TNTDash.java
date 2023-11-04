@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -16,9 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -31,7 +28,7 @@ public class TNTDash extends SpecialAbility implements Listener {
     public float dashForce = 2.0f;
     public long dashCoolDown = 2L;
     long nextAvailableUsage;
-    HashMap<UUID, Long> nextAvailableTNTDrops = new HashMap();
+    HashMap<UUID, Long> nextAvailableTNTDrops = new HashMap<>();
     Player player;
 
     public TNTDash(UUID uuid, String classifier) {
@@ -91,7 +88,8 @@ public class TNTDash extends SpecialAbility implements Listener {
         if (System.currentTimeMillis() < nextAvailableUsage) {
             if (player.getVelocity().length() >= 1.0f) {
                 for (Entity entity : player.getNearbyEntities(1, 2, 1)) {
-                    if (entity instanceof LivingEntity le && (!nextAvailableTNTDrops.containsKey(entity.getUniqueId()) || System.currentTimeMillis() >= nextAvailableTNTDrops.get(entity.getUniqueId()))) {
+                    if (entity instanceof LivingEntity le && (!nextAvailableTNTDrops.containsKey(entity.getUniqueId())
+                            || System.currentTimeMillis() >= nextAvailableTNTDrops.get(entity.getUniqueId()))) {
                         Location entityLocation = entity.getLocation();
                         spawnTNT(entityLocation, 20);
                         nextAvailableTNTDrops.put(entity.getUniqueId(), System.currentTimeMillis() + 1000L);

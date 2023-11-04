@@ -27,7 +27,6 @@ public class Berserk extends SpecialAbility implements Listener {
         this.classifier = classifier;
         this.abilityName = this.toString();
         this.playerUUID = uuid;
-        entityReveal = new EntityReveal(uuid, this.toString());
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
