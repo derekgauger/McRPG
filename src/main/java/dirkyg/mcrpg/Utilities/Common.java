@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -103,5 +105,28 @@ public class Common {
         Vector direction = player.getLocation().getDirection().normalize();
         RayTraceResult rayTrace = player.getWorld().rayTraceEntities(player.getEyeLocation(), direction, maxDistance, 0.5, (entity) -> !entity.equals(player));
         return (rayTrace != null) ? rayTrace.getHitEntity() : null;
+    }
+
+     public static Player findNearestVisiblePlayer(Entity entity) {
+        Player nearestPlayer = null;
+        double nearestDistanceSquared = Double.MAX_VALUE;
+
+        for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
+            // Skip if it's the same player or if the other player is also invisible
+            if (otherPlayer.isInvisible()) {
+                continue;
+            }
+
+            // Find the nearest visible player
+            double distanceSquared = otherPlayer.getLocation().distanceSquared(entity.getLocation());
+            if (distanceSquared > 35) {
+                continue;
+            }
+            if (distanceSquared < nearestDistanceSquared) {
+                nearestPlayer = otherPlayer;
+                nearestDistanceSquared = distanceSquared;
+            }
+        }
+        return nearestPlayer;
     }
 }

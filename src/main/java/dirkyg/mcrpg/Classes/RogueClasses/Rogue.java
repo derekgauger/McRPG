@@ -56,6 +56,7 @@ public class Rogue extends RPGClass implements Listener {
                     new PotionEffect(PotionEffectType.WATER_BREATHING, PotionEffect.INFINITE_DURATION, 1));
             doubleJump.start();
             setCurrentlyActive(true);
+            player.setInvisible(false);
         }
     }
 
@@ -69,6 +70,7 @@ public class Rogue extends RPGClass implements Listener {
             player.removePotionEffect(PotionEffectType.WATER_BREATHING);
             doubleJump.stop();
             setCurrentlyActive(false);
+            player.setInvisible(false);
         }
     }
 

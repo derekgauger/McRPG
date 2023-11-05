@@ -89,7 +89,7 @@ public class ClassManager implements Listener, CommandExecutor {
                     break;
                 case BARRIER:
                     player.closeInventory();
-                    break;
+                    return;
                 default:
                     break;
             }
@@ -155,7 +155,7 @@ public class ClassManager implements Listener, CommandExecutor {
                     break;
                 case ARROW:
                     event.getWhoClicked().openInventory(getClassSelectionGUI());
-                    break;
+                    return;
                 default:
                     break;
             }

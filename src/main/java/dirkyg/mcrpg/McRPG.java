@@ -1,10 +1,16 @@
 package dirkyg.mcrpg;
 
+import static dirkyg.mcrpg.Utilities.Common.findNearestVisiblePlayer;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -33,6 +39,7 @@ public final class McRPG extends JavaPlugin {
         } else {
             LOGGER.info("Plugin data folder exists!");
         }
+        turnOffInvisibleTargeting();
         new Listeners();
         new ClassManager();
         new ClassXpListeners();
@@ -57,5 +64,22 @@ public final class McRPG extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void turnOffInvisibleTargeting() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Check every player on the server
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    for (Entity entity : player.getNearbyEntities(10, 10, 10)) {
+                        if (player.isInvisible() && entity instanceof Monster monster) {
+                            Player nearestPlayer = findNearestVisiblePlayer(entity);
+                            monster.setTarget(nearestPlayer);
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(this, 0L, 1L); //
     }
 }

@@ -14,8 +14,8 @@ import org.bukkit.inventory.ItemStack;
 
 import dirkyg.mcrpg.McRPG;
 import dirkyg.mcrpg.Classes.RPGClass;
+import dirkyg.mcrpg.PassiveAbilities.InvisibleStanding;
 import dirkyg.mcrpg.SpecialAbilities.EntityReveal;
-import dirkyg.mcrpg.SpecialAbilities.FiringRing;
 import dirkyg.mcrpg.SpecialAbilities.HitScan;
 import dirkyg.mcrpg.SpecialAbilities.SpecialAbility;
 import dirkyg.mcrpg.SpecialAbilities.Swapper;
@@ -24,28 +24,29 @@ public class Sniper extends RPGClass implements Listener {
 
     EntityReveal entityReveal;
     HitScan hitScan;
-    FiringRing firingRing;
-
+    InvisibleStanding invisibleStanding;
+    
     public Sniper(UUID uuid) {
         this.uuid = uuid;
         baseClass = new Ranger(uuid);
         entityReveal = new EntityReveal(uuid, this.toString());
         hitScan = new HitScan(uuid, this.toString());
-        firingRing = new FiringRing(uuid, this.toString());
-        swapper = new Swapper(uuid, this, new SpecialAbility[] { entityReveal, hitScan, firingRing });
+        invisibleStanding = new InvisibleStanding(uuid);
+        swapper = new Swapper(uuid, this, new SpecialAbility[] { entityReveal, hitScan });
         Bukkit.getPluginManager().registerEvents(this, McRPG.plugin);
     }
 
     @Override
     public void activatePlayer() {
         baseClass.activatePlayer();
+        invisibleStanding.start();
         setCurrentlyActive(true);
-
     }
-
+    
     @Override
     public void deactivatePlayer() {
         baseClass.deactivatePlayer();
+        invisibleStanding.stop();
         setCurrentlyActive(false);
     }
 

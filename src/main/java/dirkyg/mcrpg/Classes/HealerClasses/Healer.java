@@ -51,6 +51,7 @@ public class Healer extends RPGClass implements Listener {
             autoHeal.startAutoHealing(player);
             player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 2));
             setCurrentlyActive(true);
+            player.setInvisible(false);
         }
     }
 
@@ -63,6 +64,7 @@ public class Healer extends RPGClass implements Listener {
             player.removePotionEffect(PotionEffectType.DOLPHINS_GRACE);
             autoHeal.stop();
             setCurrentlyActive(false);
+            player.setInvisible(false);
         }
     }
 

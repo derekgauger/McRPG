@@ -60,6 +60,7 @@ public class Wizard extends RPGClass implements Listener {
             wand = createGUIItem(Material.STICK, ("&b" + player.getName() + "'s Wand"), 1);
             addItemToInventory(wand, player);
             setCurrentlyActive(true);
+            player.setInvisible(false);
         }
     }
 
@@ -68,6 +69,7 @@ public class Wizard extends RPGClass implements Listener {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             setCurrentlyActive(false);
+            player.setInvisible(false);
         }
     }
 
@@ -94,7 +96,7 @@ public class Wizard extends RPGClass implements Listener {
             double modifiedDamage = originalDamage * damageMultiplier;
             le.damage(modifiedDamage, player);
             processedEntities.remove(le.getUniqueId());
-            event.setCancelled(true);
+            event.setCancelled(true );
         }
     }
 

@@ -52,6 +52,7 @@ public class Warrior extends RPGClass implements Listener {
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(32.0);
             nearDeathExperience.start();
             setCurrentlyActive(true);
+            player.setInvisible(false);
         }
     }
 
@@ -63,6 +64,7 @@ public class Warrior extends RPGClass implements Listener {
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0);
             nearDeathExperience.stop();
             setCurrentlyActive(false);
+            player.setInvisible(false);
         }
     }
 
